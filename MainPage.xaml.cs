@@ -9,6 +9,8 @@ namespace MauiMapAppDemo
         public MainPage()
         {
             InitializeComponent();
+            Navigation.PushAsync(new MapsDemo()); //just redirect to maps demo
+
         }
 
         private void OnNavigateToMapsButtonClicked(object? sender, EventArgs e)
