@@ -35,6 +35,7 @@ namespace MauiMapAppDemo
 
             builder.Services.AddSingleton<OpenTopoService>();
             builder.Services.AddSingleton<GeocodingService>();
+            builder.Services.AddSingleton<DialogService>();
 
             return builder.Build();
         }

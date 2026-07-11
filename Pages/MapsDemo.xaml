@@ -2,7 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiMapAppDemo.Pages.MapsDemo"
+             xmlns:viewmodels="clr-namespace:MauiMapAppDemo.ViewModels"
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:behaviors="clr-namespace:MauiMapAppDemo.Behaviors"             
+             x:DataType="viewmodels:MapsViewModel"
              Title="Maps demo">
 
     <Grid
@@ -22,9 +26,17 @@
             HorizontalOptions="Center" />
 
         <maps:Map Grid.Row="2" 
-                  x:Name="MapCtrl" 
-                  MapType="Street"
-                  MapClicked="MapCtrl_MapClicked"  />
+                  Margin="2"
+                  x:Name="MapCtrl"
+                  MapType="Street">
+            <maps:Map.Behaviors>
+                <behaviors:MapPinsBehavior
+                    BindingContext="{Binding Source={x:Reference MapCtrl}, Path=BindingContext}"
+                    Center="{Binding MapCenter}"
+                    PinItems="{Binding CabinPins}" 
+                    PinClickedCommand="{Binding PinClickedCommand}" />
+            </maps:Map.Behaviors>
+        </maps:Map>
 
     </Grid>
 </ContentPage>
