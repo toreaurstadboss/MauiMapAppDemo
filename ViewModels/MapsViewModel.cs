@@ -32,25 +32,38 @@ namespace MauiMapAppDemo.ViewModels
         [RelayCommand]
         private async Task PinClicked(MapPinModel pin)
         {
-            var elevation =
-                await _openTopoService.GetElevationAsync(
-                    pin.Latitude,
-                    pin.Longitude);
+            _pinClickInProgress = true;
+            try
+            {
+                var elevation =
+                    await _openTopoService.GetElevationAsync(
+                        pin.Latitude,
+                        pin.Longitude);
 
-            var placementInfo =
-                await _geocodingService.GetGeocodingPlacemark(
-                    pin.Latitude,
-                    pin.Longitude);
+                var placementInfo =
+                    await _geocodingService.GetGeocodingPlacemark(
+                        pin.Latitude,
+                        pin.Longitude);
 
-            await _dialogService.ShowAlertAsync(
-                pin.Label,
-                $"{pin.Address}\n\nElevation: {elevation}m\n\n{placementInfo}",
-                "OK");
+                await _dialogService.ShowAlertAsync(
+                    pin.Label,
+                    $"{pin.Address}\n\nElevation: {elevation}m\n\n{placementInfo}",
+                    "OK");
+            }
+            catch
+            {
+                _pinClickInProgress = false;
+            }
         }
 
         [RelayCommand]
-        private async Task MapClick(Location location)
+        private async Task MapClicked(Location location)
         {
+            if (_pinClickInProgress)
+            {
+                return;
+            }
+
             var elevationOfPoint = await _openTopoService.GetElevationAsync(location.Latitude, location.Longitude);
             await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", location.Latitude, location.Longitude);
         }

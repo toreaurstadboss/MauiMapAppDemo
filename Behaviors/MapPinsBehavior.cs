@@ -1,6 +1,7 @@
 ﻿using MauiMapAppDemo.ViewModels;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
+using System.Net.NetworkInformation;
 using System.Windows.Input;
 
 namespace MauiMapAppDemo.Behaviors
@@ -39,6 +40,19 @@ namespace MauiMapAppDemo.Behaviors
             set => SetValue(PinItemsProperty, value);
         }
 
+        public static readonly BindableProperty MapClickedCommandProperty =
+            BindableProperty.Create(
+                nameof(MapClickedCommand),
+                typeof(ICommand),
+                typeof(MapPinsBehavior),
+                defaultValue: null);
+
+        public ICommand MapClickedCommand
+        {
+            get => (ICommand)GetValue(MapClickedCommandProperty);
+            set => SetValue(MapClickedCommandProperty, value);
+        }
+
         public static readonly BindableProperty PinClickedCommandProperty =
            BindableProperty.Create(
                nameof(PinClickedCommand),
@@ -56,6 +70,8 @@ namespace MauiMapAppDemo.Behaviors
         {
             _map = bindable;
 
+            WireUpMapClickedCommand(bindable);
+
             base.OnAttachedTo(bindable);
 
             RefreshPins();
@@ -64,6 +80,17 @@ namespace MauiMapAppDemo.Behaviors
             {
                 _map.MoveToRegion(MapSpan.FromCenterAndRadius(Center, Distance.FromKilometers(8)));
             }
+        }
+
+        private void WireUpMapClickedCommand(Microsoft.Maui.Controls.Maps.Map map)
+        {
+            map.MapClicked += (object? sender, MapClickedEventArgs e) =>
+            {
+                if (MapClickedCommand?.CanExecute(e.Location) == true)
+                {
+                    MapClickedCommand.Execute(e.Location);
+                }
+            };
         }
 
         protected override void OnDetachingFrom(Microsoft.Maui.Controls.Maps.Map bindable)

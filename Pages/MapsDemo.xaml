@@ -34,6 +34,7 @@
                     BindingContext="{Binding Source={x:Reference MapCtrl}, Path=BindingContext}"
                     Center="{Binding MapCenter}"
                     PinItems="{Binding CabinPins}" 
+                    MapClickedCommand="{Binding MapClickedCommand}"
                     PinClickedCommand="{Binding PinClickedCommand}" />
             </maps:Map.Behaviors>
         </maps:Map>
