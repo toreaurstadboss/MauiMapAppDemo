@@ -1,3 +1,5 @@
+using MauiMapAppDemo.Repositories.PinLocations;
+using MauiMapAppDemo.Services;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 
@@ -5,7 +7,9 @@ namespace MauiMapAppDemo.Pages;
 
 public partial class MapsDemo : ContentPage
 {
-	public MapsDemo()
+    private readonly OpenTopoService _openTopoService;
+
+    public MapsDemo(OpenTopoService openTopoService)
 	{
 		InitializeComponent();
 
@@ -14,34 +18,20 @@ public partial class MapsDemo : ContentPage
         MapCtrl.MoveToRegion(
                     MapSpan.FromCenterAndRadius(
                         initialLocation,
-                        Distance.FromKilometers(5)));
+                        Distance.FromKilometers(8)));
 
         AddPinToCabins();
-
+        _openTopoService = openTopoService;
     }
 
     private void AddPinToCabins()
     {
-        AddPin("Estenstadhytta",
-                   "Popular hiking and ski cabin",
-                   63.39478511341777, 10.488396418945399);
+        var cabins = TrondheimCabins.GetSampleData();
 
-        AddPin("Elgsethytta",
-            "Classic cabin in Bymarka",
-           63.42046109744264, 10.21251573534687);
-
-        AddPin("Skistua",
-            "Gateway to Bymarka",
-            63.41789876758627, 10.26377206090971);
-
-        AddPin("Grønlia",
-            "Popular stop for skiers",
-            63.40284632068321, 10.243509429760273);
-
-        AddPin("Rønningen",
-            "Cabin and cafe",
-            63.37881115331552, 10.262531628360053);
-
+        foreach (var cabin in cabins)
+        {
+            AddPin(cabin.Name, cabin.Description, cabin.Latitude, cabin.Longitude);
+        }
     }
 
     private void AddPin(
@@ -50,12 +40,27 @@ public partial class MapsDemo : ContentPage
         double latitude,
         double longitude)
     {
-        MapCtrl.Pins.Add(new Pin
-        {            
+        var pin = new Pin
+        {
             Label = label,
             Address = address,
             Location = new Location(latitude, longitude)
-        });    
+        };
+
+        pin.MarkerClicked += async (s, e) =>
+        {
+
+            var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
+
+            await DisplayAlertAsync(
+                    label,
+                    address + $"\nElevation (Open Topo Data API): {elevationOfPoint} m (m.a.s.)",
+                    "OK"
+                ); //on click , alert the pin data also via this marker clicked callback 
+
+        };
+
+        MapCtrl.Pins.Add(pin);    
     }
 
 

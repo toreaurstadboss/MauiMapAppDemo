@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using MauiMapAppDemo.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +32,8 @@ namespace MauiMapAppDemo
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddSingleton<OpenTopoService>();
 
             return builder.Build();
         }
