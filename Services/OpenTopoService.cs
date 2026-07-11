@@ -33,7 +33,7 @@ namespace MauiMapAppDemo.Services
 
         /// <summary>
         /// Retrieves the elevation if found for a given latitude and longitude. Returns the scalar elevation, if found.
-        /// </summary>
+        /// </summary>  
         /// <param name="latitude">Latitude of point to get elevation for. Note that EU-DEM has +- 7m RMSE precision</param>
         /// <param name="longitude"></param>
         /// <param name="dataSetId">Eudem25m is default data set id. See https://www.opentopodata.org/datasets/eudem/ There are other data set Ids covering rest of the regions of the world, a global dataSetId is 'aster30m'</param>

@@ -13,7 +13,7 @@
      VerticalOptions="Center" 
      HorizontalOptions="Center" />
 
-        <maps:Map Grid.Row="1" x:Name="MapCtrl" MapType="Street" />
+        <maps:Map Grid.Row="1" x:Name="MapCtrl" MapType="Street" MapClicked="MapCtrl_MapClicked"  />
 
 
     </Grid>

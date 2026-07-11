@@ -9,6 +9,8 @@ public partial class MapsDemo : ContentPage
 {
     private readonly OpenTopoService _openTopoService;
 
+    private bool _pinClickInProgress = false;
+
     public MapsDemo(OpenTopoService openTopoService)
 	{
 		InitializeComponent();
@@ -49,19 +51,41 @@ public partial class MapsDemo : ContentPage
 
         pin.MarkerClicked += async (s, e) =>
         {
-
-            var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
-
-            await DisplayAlertAsync(
-                    label,
-                    address + $"\nElevation (Open Topo Data API): {elevationOfPoint} m (m.a.s.)",
-                    "OK"
-                ); //on click , alert the pin data also via this marker clicked callback 
-
+            _pinClickInProgress = true;
+            try
+            {
+                await ShowLocationInformationAlert(label, address, latitude, longitude);
+            }
+            finally
+            {
+                _pinClickInProgress = false;
+            }
         };
 
         MapCtrl.Pins.Add(pin);    
     }
 
+    private async Task ShowLocationInformationAlert(string label, string address, double latitude, double longitude)
+    {
+        var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
+
+        await DisplayAlertAsync(
+                label,
+                address + $"\nElevation (Open Topo Data API): {elevationOfPoint} m (m.a.s.)",
+                "OK"
+            ); //on click , alert the pin data also via this marker clicked callback 
+    }
+
+    public async void MapCtrl_MapClicked(object sender, MapClickedEventArgs e)
+    {
+        if (_pinClickInProgress)
+        {
+            return;
+        }
+
+        var elevationOfPoint = await _openTopoService.GetElevationAsync(e.Location.Latitude, e.Location.Longitude);
+
+        await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", e.Location.Latitude, e.Location.Longitude);
+    }
 
 }
