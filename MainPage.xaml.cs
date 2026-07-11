@@ -7,17 +7,19 @@ namespace MauiMapAppDemo
     {
         int count = 0;
         private readonly OpenTopoService _openTopoService;
+        private readonly GeocodingService _geocodingService;
 
-        public MainPage(OpenTopoService openTopoService)
+        public MainPage(OpenTopoService openTopoService, GeocodingService geocodingService)
         {
             InitializeComponent();
-            Navigation.PushAsync(new MapsDemo(openTopoService)); //just redirect to maps demo
-            this._openTopoService = openTopoService;
+            Navigation.PushAsync(new MapsDemo(openTopoService, geocodingService)); //just redirect to maps demo
+            _openTopoService = openTopoService;
+            _geocodingService = geocodingService;
         }
 
         private void OnNavigateToMapsButtonClicked(object? sender, EventArgs e)
         {
-            Navigation.PushAsync(new MapsDemo(_openTopoService));
+            Navigation.PushAsync(new MapsDemo(_openTopoService, _geocodingService));
         }
 
         private void OnCounterClicked(object? sender, EventArgs e)

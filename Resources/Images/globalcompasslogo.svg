@@ -1,0 +1,131 @@
+﻿<svg width="800" height="220" viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+
+	<defs>
+		<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0%" stop-color="#0f172a"/>
+			<stop offset="100%" stop-color="#134e4a"/>
+		</linearGradient>
+
+		<linearGradient id="mountain" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0%" stop-color="#e2e8f0"/>
+			<stop offset="100%" stop-color="#64748b"/>
+		</linearGradient>
+
+		<filter id="shadow">
+			<feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+
+	<!-- Background -->
+	<rect width="100%" height="100%" fill="url(#bg)" rx="20"/>
+
+	<!-- Decorative topo lines -->
+	<g opacity="0.08" stroke="white" fill="none">
+		<ellipse cx="250" cy="110" rx="180" ry="60"/>
+		<ellipse cx="250" cy="110" rx="220" ry="80"/>
+		<ellipse cx="550" cy="100" rx="150" ry="50"/>
+		<ellipse cx="550" cy="100" rx="190" ry="70"/>
+	</g>
+
+	<!-- Compass -->
+	<g transform="translate(120 110)" filter="url(#shadow)">
+		<circle r="55" fill="#ffffff22" stroke="#e2e8f0" stroke-width="2"/>
+
+		<polygon points="0,-42 8,0 0,42 -8,0"
+				 fill="#ef4444"/>
+
+		<polygon points="-42,0 0,-8 42,0 0,8"
+				 fill="#f8fafc"/>
+
+		<text x="0" y="-62"
+			  text-anchor="middle"
+			  fill="white"
+			  font-size="14"
+			  font-family="Segoe UI">N</text>
+	</g>
+
+	<!-- Globe -->
+	<g transform="translate(400 110)" filter="url(#shadow)">
+		<circle r="55" fill="#0ea5e9" stroke="#e0f2fe" stroke-width="2"/>
+
+		<ellipse rx="40" ry="55"
+				 fill="none"
+				 stroke="#e0f2fe"
+				 opacity="0.7"/>
+
+		<ellipse rx="20" ry="55"
+				 fill="none"
+				 stroke="#e0f2fe"
+				 opacity="0.7"/>
+
+		<ellipse rx="55" ry="20"
+				 fill="none"
+				 stroke="#e0f2fe"
+				 opacity="0.7"/>
+
+		<ellipse rx="55" ry="40"
+				 fill="none"
+				 stroke="#e0f2fe"
+				 opacity="0.7"/>
+	</g>
+
+	<!-- Altimeter -->
+	<g transform="translate(680 110)" filter="url(#shadow)">
+		<circle r="55"
+				fill="#ffffff22"
+				stroke="#e2e8f0"
+				stroke-width="2"/>
+
+		<path d="M -35 20 A 40 40 0 0 1 35 20"
+			  fill="none"
+			  stroke="#e2e8f0"
+			  stroke-width="3"/>
+
+		<line x1="0"
+			  y1="0"
+			  x2="22"
+			  y2="-24"
+			  stroke="#22c55e"
+			  stroke-width="4"
+			  stroke-linecap="round"/>
+
+		<circle r="5" fill="#f8fafc"/>
+
+		<text x="0"
+			  y="35"
+			  text-anchor="middle"
+			  fill="white"
+			  font-size="10"
+			  font-family="Segoe UI">
+			ALT
+		</text>
+	</g>
+
+	<!-- Mountains -->
+	<g transform="translate(0 35)">
+		<polygon points="260,140 340,40 420,140"
+				 fill="url(#mountain)"
+				 opacity="0.95"/>
+
+		<polygon points="320,140 420,20 520,140"
+				 fill="#94a3b8"/>
+
+		<polygon points="400,140 500,55 600,140"
+				 fill="#cbd5e1"/>
+
+		<polygon points="410,32 420,20 430,32"
+				 fill="white"/>
+	</g>
+
+	<!-- Title -->
+	<text x="400"
+		  y="205"
+		  text-anchor="middle"
+		  fill="white"
+		  font-size="24"
+		  font-weight="600"
+		  font-family="Segoe UI">
+		Mobile Map Explorer with Altimeter
+	</text>
+
+</svg>

@@ -8,10 +8,10 @@ namespace MauiMapAppDemo.Pages;
 public partial class MapsDemo : ContentPage
 {
     private readonly OpenTopoService _openTopoService;
-
+    private readonly GeocodingService _geocodingService;
     private bool _pinClickInProgress = false;
 
-    public MapsDemo(OpenTopoService openTopoService)
+    public MapsDemo(OpenTopoService openTopoService, GeocodingService geocodingService)
 	{
 		InitializeComponent();
 
@@ -24,6 +24,7 @@ public partial class MapsDemo : ContentPage
 
         AddPinToCabins();
         _openTopoService = openTopoService;
+        _geocodingService = geocodingService;
     }
 
     private void AddPinToCabins()
@@ -69,9 +70,11 @@ public partial class MapsDemo : ContentPage
     {
         var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
 
+        var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
+
         await DisplayAlertAsync(
                 label,
-                address + $"\nElevation (Open Topo Data API): {elevationOfPoint} m (m.a.s.)",
+                address + $"\n\nElevation: {elevationOfPoint} m\n\nGeocoding (Placement) info:\n {placementInfo ?? "<None>"}",
                 "OK"
             ); //on click , alert the pin data also via this marker clicked callback 
     }
