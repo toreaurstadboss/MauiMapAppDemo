@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Maui;
+using MauiMapAppDemo.Behaviors;
 using MauiMapAppDemo.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Maps.Handlers;
 
 namespace MauiMapAppDemo
 {
@@ -19,6 +21,24 @@ namespace MauiMapAppDemo
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+#if ANDROID
+            MapPinHandler.Mapper.AppendToMapping("MeasurementPinIcons", (handler, mapPin) =>
+            {
+                if (mapPin is not MeasurementPin measurementPin)
+                {
+                    return;
+                }
+
+                var resourceId = GetDrawableResourceId(measurementPin.IconResourceName);
+                if (resourceId == 0)
+                {
+                    return;
+                }
+
+                handler.PlatformView.SetIcon(Android.Gms.Maps.Model.BitmapDescriptorFactory.FromResource(resourceId));
+            });
+#endif
 
 #if DEBUG
             //NOTE : This demo app code only will show App in LocalDEV since we use USER SECRETS ! 
@@ -39,5 +59,23 @@ namespace MauiMapAppDemo
 
             return builder.Build();
         }
+
+#if ANDROID
+        private static int GetDrawableResourceId(string resourceName)
+        {
+            if (string.IsNullOrWhiteSpace(resourceName))
+            {
+                return 0;
+            }
+
+            var field = typeof(Resource.Drawable).GetField(resourceName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.IgnoreCase);
+            if (field?.GetValue(null) is int resourceId)
+            {
+                return resourceId;
+            }
+
+            return 0;
+        }
+#endif
     }
 }

@@ -201,12 +201,12 @@ namespace MauiMapAppDemo.Behaviors
             }
             else
             {
-                _startPin = new Pin
+                _startPin = new MeasurementPin
                 {
                     Label = "Start",
                     Address = "Measurement Start",
-                    Location = MeasureStart
-                    //TODO: Use a Green diode pin icon
+                    Location = MeasureStart,
+                    IconResourceName = "startmarkerv2"
                 };
 
                 _map.Pins.Add(_startPin);
@@ -220,12 +220,12 @@ namespace MauiMapAppDemo.Behaviors
             {
 
 
-                _endPin = new Pin
+                _endPin = new MeasurementPin
                 {
                     Label = "End",
                     Address = "Measurement End",
-                    Location = MeasureEnd
-                    //TODO: Use a Green diode pin icon
+                    Location = MeasureEnd,
+                    IconResourceName = "endmarkerv2"
                 };
 
                 _map.Pins.Add(_endPin);
