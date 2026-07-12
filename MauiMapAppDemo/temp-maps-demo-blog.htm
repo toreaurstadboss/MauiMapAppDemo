@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MAUI Maps Demo Notes</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1f2430;
+      --muted: #5c667a;
+      --accent: #6a5acd;
+      --accent2: #1f9d55;
+      --border: #d7dce6;
+      --codebg: #0f172a;
+      --codefg: #e2e8f0;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f6f7fb 0%, #eef2ff 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    article {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      padding: 28px;
+    }
+    h1, h2 {
+      line-height: 1.2;
+      margin: 0 0 14px;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+    h2 {
+      margin-top: 28px;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    p {
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .callout {
+      background: #f1f5ff;
+      border-left: 4px solid var(--accent);
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 18px 0;
+    }
+    pre {
+      margin: 14px 0 20px;
+      overflow: auto;
+      background: var(--codebg);
+      color: var(--codefg);
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    code.hljs.csharp {
+      display: block;
+      white-space: pre;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92rem;
+    }
+    ul {
+      margin: 0 0 16px 20px;
+      padding: 0;
+    }
+    li {
+      margin: 0 0 8px;
+    }
+    .tag {
+      display: inline-block;
+      background: #eefbf3;
+      color: #0f6b35;
+      border: 1px solid #c7ead5;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.86rem;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <h1>MAUI Maps Demo Notes 🗺️</h1>
+      <div class="meta">A short summary of the map demo, measurement mode, and pin icon adjustments.</div>
+
+      <p>
+        This demo shows a .NET MAUI map page with two main ideas: regular cabin pins and a measure mode that lets the user tap two points to draw a red line and calculate distance. The page is driven by a view model, while a map behavior keeps the map logic reusable and keeps the XAML clean.
+      </p>
+
+      <div class="callout">
+        🔒 The app reads Google Maps and Azure Maps keys from user secrets during local development. The keys are not exposed in the solution or this article.
+      </div>
+
+      <h2>What the solution does</h2>
+      <ul>
+        <li>Loads cabin pin data from the view model.</li>
+        <li>Supports a measure mode that tracks start and end taps.</li>
+        <li>Draws a polyline between the two points when both locations are set.</li>
+        <li>Uses custom measurement marker icons so the start and end pins are easier to spot.</li>
+        <li>Keeps the layout polished with spacing around the logo, button, and map.</li>
+      </ul>
+
+      <h2>Behavior</h2>
+      <p>
+        The behavior listens for map clicks, manages the temporary measure pins, and clears the graphics when measure mode is turned off.
+        It also wires the pin click command for normal cabin markers.
+      </p>
+      <pre><code class="hljs csharp">using MauiMapAppDemo.ViewModels;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Maps;
+using System.Windows.Input;
+
+namespace MauiMapAppDemo.Behaviors
+{
+    public class MapPinsBehavior : Behavior&lt;Microsoft.Maui.Controls.Maps.Map&gt;
+    {
+        public static readonly BindableProperty IsMeasuringModeProperty =
+            BindableProperty.Create(
+                nameof(IsMeasuringMode),
+                typeof(bool),
+                typeof(MapPinsBehavior),
+                false,
+                propertyChanged: OnMeasurementStateChanged);
+
+        private void RefreshMeasurementLine()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            ClearMeasurementGraphics();
+
+            if (MeasureStart == null || MeasureEnd == null)
+            {
+                return;
+            }
+
+            _startPin = new MeasurementPin
+            {
+                Label = &quot;Start&quot;,
+                Address = &quot;Measurement Start&quot;,
+                Location = MeasureStart,
+                IconResourceName = &quot;startmarkerv2&quot;
+            };
+
+            _endPin = new MeasurementPin
+            {
+                Label = &quot;End&quot;,
+                Address = &quot;Measurement End&quot;,
+                Location = MeasureEnd,
+                IconResourceName = &quot;endmarkerv2&quot;
+            };
+        }
+    }
+}</code></pre>
+
+      <h2>View model</h2>
+      <p>
+        The view model owns the state: measurement mode, the first and second tapped locations, the computed distance, and the cabin pins.
+        That keeps the behavior focused on map rendering and interaction.
+      </p>
+      <pre><code class="hljs csharp">using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+
+namespace MauiMapAppDemo.ViewModels
+{
+    public partial class MapsViewModel : ObservableObject
+    {
+        [ObservableProperty]
+        public bool _isMeasuringMode;
+
+        [ObservableProperty]
+        private Location? _firstLocationMeasureMode;
+
+        [ObservableProperty]
+        private Location? _secondLocationMeasureMode;
+
+        [ObservableProperty]
+        private double _distanceMeasuredKm;
+
+        public ObservableCollection&lt;MapPinModel&gt; CabinPins { get; } = [];
+
+        [RelayCommand]
+        private async Task MapClicked(Location location)
+        {
+            if (IsMeasuringMode)
+            {
+                HandleMeasuringMode(location);
+                return;
+            }
+
+            await HandleDefaultMapClicked(location);
+        }
+    }
+}</code></pre>
+
+      <h2>Marker icons 📍</h2>
+      <p>
+        The biggest visual improvement was the measurement markers. The solution now uses small transparent SVG assets for the start and end points, which avoids oversized default-looking icons and keeps the map readable.
+      </p>
+      <p>
+        The important part was keeping those marker assets compact and making sure the Android handler only applies them to the measurement pins.
+      </p>
+
+      <h2>Layout cleanup</h2>
+      <p>
+        The page also got a small spacing pass: the button gained more breathing room and a larger corner radius, the logo and map got margins, and the Eudem-25 info label was moved higher so the top of the page reads more naturally.
+      </p>
+
+      <p class="footer-note">
+        This is a temporary note page, so it stays short and practical. ✨
+      </p>
+    </article>
+  </main>
+</body>
+</html>

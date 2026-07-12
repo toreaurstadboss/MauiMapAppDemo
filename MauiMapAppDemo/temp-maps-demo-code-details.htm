@@ -1,0 +1,481 @@
+<article>
+  <h1>MAUI Maps Demo - Code Details</h1>
+  <p>This is a compact code detail listing for the two core pieces behind the demo: the map behavior and the view model. It is meant as a quick reference for how the map, measurement flow, and pin handling fit together.</p>
+
+  <h2>MapPinsBehavior</h2>
+  <p>The behavior owns map interaction, pin rendering, measurement graphics, and the custom marker icon hookup used for the start and end measurement pins.</p>
+  <pre><code class="hljs csharp">using MauiMapAppDemo.ViewModels;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Maps;
+using System.Windows.Input;
+
+namespace MauiMapAppDemo.Behaviors
+{
+
+    public class MapPinsBehavior : Behavior&lt;Microsoft.Maui.Controls.Maps.Map&gt;
+    {
+
+        private Microsoft.Maui.Controls.Maps.Map? _map;
+
+        private Microsoft.Maui.Controls.Maps.Polyline? _measurementLine;
+
+        private Microsoft.Maui.Controls.Maps.Pin? _startPin;
+        private Microsoft.Maui.Controls.Maps.Pin? _endPin;
+
+
+        public static readonly BindableProperty IsMeasuringModeProperty =
+            BindableProperty.Create(
+                nameof(IsMeasuringMode),
+                typeof(bool),
+                typeof(MapPinsBehavior),
+                false,
+                propertyChanged: OnMeasurementStateChanged);
+
+        public bool IsMeasuringMode
+        {
+            get =&gt; (bool)GetValue(IsMeasuringModeProperty);
+            set =&gt; SetValue(IsMeasuringModeProperty, value);
+        }
+
+
+        public static readonly BindableProperty MeasureStartProperty =
+            BindableProperty.Create(
+                nameof(MeasureStart),
+                typeof(Location),
+                typeof(MapPinsBehavior),
+                propertyChanged: OnMeasurementChanged
+            );
+
+        public Location MeasureStart
+        {
+            get =&gt; (Location)GetValue(MeasureStartProperty);
+            set =&gt; SetValue(MeasureStartProperty, value);
+        }
+
+        public static readonly BindableProperty MeasureEndProperty =
+            BindableProperty.Create(
+                nameof(MeasureEnd),
+                typeof(Location),
+                typeof(MapPinsBehavior),
+                propertyChanged: OnMeasurementChanged
+            );
+
+        public Location MeasureEnd
+        {
+            get =&gt; (Location)GetValue(MeasureEndProperty);
+            set =&gt; SetValue(MeasureEndProperty, value);
+        }
+
+
+        public static readonly BindableProperty CenterProperty =
+         BindableProperty.Create(
+             nameof(Center),
+             typeof(Location),
+             typeof(MapPinsBehavior),
+             propertyChanged: OnCenterChanged
+             );
+
+        public Location Center
+        {
+            get =&gt; (Location)GetValue(CenterProperty);
+            set =&gt; SetValue(CenterProperty, value);
+        }
+
+        public static readonly BindableProperty PinItemsProperty =
+            BindableProperty.Create(
+                nameof(PinItems),
+                typeof(IEnumerable&lt;MapPinModel&gt;),
+                typeof(MapPinsBehavior),
+                propertyChanged: OnPinItemsChanged
+                );      
+
+        public IEnumerable&lt;MapPinModel&gt;? PinItems
+        {
+            get =&gt; (IEnumerable&lt;MapPinModel&gt;?)GetValue(PinItemsProperty);
+            set =&gt; SetValue(PinItemsProperty, value);
+        }
+
+        public static readonly BindableProperty MapClickedCommandProperty =
+            BindableProperty.Create(
+                nameof(MapClickedCommand),
+                typeof(ICommand),
+                typeof(MapPinsBehavior),
+                defaultValue: null);
+
+        public ICommand MapClickedCommand
+        {
+            get =&gt; (ICommand)GetValue(MapClickedCommandProperty);
+            set =&gt; SetValue(MapClickedCommandProperty, value);
+        }
+
+        public static readonly BindableProperty PinClickedCommandProperty =
+           BindableProperty.Create(
+               nameof(PinClickedCommand),
+               typeof(ICommand),
+               typeof(MapPinsBehavior),
+               defaultValue: null);
+
+        public ICommand PinClickedCommand
+        {
+            get =&gt; (ICommand)GetValue(PinClickedCommandProperty);
+            set =&gt; SetValue(PinClickedCommandProperty, value);
+        }
+
+        protected override void OnAttachedTo(Microsoft.Maui.Controls.Maps.Map bindable)
+        {
+            _map = bindable;
+
+            WireUpMapClickedCommand(bindable);
+
+            base.OnAttachedTo(bindable);
+
+            RefreshPins();
+
+            if (Center is not null)
+            {
+                _map.MoveToRegion(MapSpan.FromCenterAndRadius(Center, Distance.FromKilometers(8)));
+            }
+        }
+
+        private void WireUpMapClickedCommand(Microsoft.Maui.Controls.Maps.Map map)
+        {
+            map.MapClicked += (object? sender, MapClickedEventArgs e) =&gt;
+            {
+                if (MapClickedCommand?.CanExecute(e.Location) == true)
+                {
+                    MapClickedCommand.Execute(e.Location);
+                }
+            };
+        }
+
+        protected override void OnDetachingFrom(Microsoft.Maui.Controls.Maps.Map bindable)
+        {
+            _map = null;
+
+            base.OnDetachingFrom(bindable);
+        }
+
+        private static void OnCenterChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            var behavior = (MapPinsBehavior)bindable;
+
+            if (behavior._map is not null &amp;&amp; newValue is Location location)
+            {
+                behavior._map.MoveToRegion(MapSpan.FromCenterAndRadius(location,
+                    Distance.FromKilometers(8)));
+            }
+        }
+
+        private static void OnMeasurementChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            ((MapPinsBehavior)bindable).RefreshMeasurementLine();
+        }
+
+
+        private static void OnMeasurementStateChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            var behavior = (MapPinsBehavior)bindable;
+
+            if (!(bool)newValue)
+            {
+                behavior.ClearMeasurementGraphics();
+            }
+        }
+
+
+        private void RefreshMeasurementLine()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            ClearMeasurementGraphics();
+
+            if (MeasureStart == null)
+            {
+                return;
+            }
+            else
+            {
+                _startPin = new MeasurementPin
+                {
+                    Label = &quot;Start&quot;,
+                    Address = &quot;Measurement Start&quot;,
+                    Location = MeasureStart,
+                    IconResourceName = &quot;startmarkerv2&quot;
+                };
+
+                _map.Pins.Add(_startPin);
+            }
+
+            if (MeasureEnd == null)
+            {
+                return;
+            }
+            else
+            {
+
+
+                _endPin = new MeasurementPin
+                {
+                    Label = &quot;End&quot;,
+                    Address = &quot;Measurement End&quot;,
+                    Location = MeasureEnd,
+                    IconResourceName = &quot;endmarkerv2&quot;
+                };
+
+                _map.Pins.Add(_endPin);
+            }
+
+            _measurementLine = new Polyline
+            {
+                StrokeColor = Colors.Red,
+                StrokeWidth = 5
+            };
+
+            _measurementLine.Geopath.Add(MeasureStart);
+            _measurementLine.Geopath.Add(MeasureEnd);
+
+            _map.MapElements.Add(_measurementLine);
+        }
+
+        private static void OnPinItemsChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            ((MapPinsBehavior)bindable).RefreshPins();
+        }
+
+        private void ClearMeasurementGraphics()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            if (_startPin != null)
+            {
+                _map.Pins.Remove(_startPin);
+            }
+
+            if (_endPin != null)
+            {
+                _map.Pins.Remove(_endPin);
+            }
+
+            if (_measurementLine != null)
+            {
+                _map.MapElements.Remove(_measurementLine);
+            }
+
+            _startPin = null;
+            _endPin = null;
+            _measurementLine = null;
+        }
+
+        private void RefreshPins()
+        {
+            if (_map is null || PinItems is null)
+                return;
+
+            _map.Pins.Clear();
+
+            foreach (var item in PinItems.OfType&lt;MapPinModel&gt;())
+            {
+                var pin = new Pin
+                {
+                    Label = item.Label,
+                    Address = item.Address,
+                    Location = new Location(
+                        item.Latitude,
+                        item.Longitude)
+                };
+
+                pin.MarkerClicked += (_, _) =&gt;
+                {
+                    if (PinClickedCommand?.CanExecute(item) == true)
+                    {
+                        PinClickedCommand.Execute(item);
+                    }
+                };
+
+                _map.Pins.Add(pin);
+            }
+        }
+
+
+
+
+    }
+}</code></pre>
+
+  <h2>MapsViewModel</h2>
+  <p>The view model owns the measurement state, the list of cabin pins, and the commands invoked by the page and the behavior.</p>
+  <pre><code class="hljs csharp">using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MauiMapAppDemo.Repositories.PinLocations;
+using MauiMapAppDemo.Services;
+using System.Collections.ObjectModel;
+
+namespace MauiMapAppDemo.ViewModels
+{
+
+    public partial class MapsViewModel : ObservableObject
+    {
+        private readonly OpenTopoService _openTopoService;
+        private readonly GeocodingService _geocodingService;
+        private readonly DialogService _dialogService;
+
+        private bool _pinClickInProgress = false;
+
+        [ObservableProperty]
+        public bool _isMeasuringMode;
+
+        [ObservableProperty]
+        private Location? _firstLocationMeasureMode;
+
+        [ObservableProperty]
+        private Location? _secondLocationMeasureMode;
+
+        [ObservableProperty]
+        private double _distanceMeasuredKm;
+
+        public ObservableCollection&lt;MapPinModel&gt; CabinPins { get; } = [];
+
+        public Location MapCenter { get; } = new(63.4305, 10.3951);
+
+        public MapsViewModel(OpenTopoService openTopoService, GeocodingService geocodingService, DialogService dialogService)
+        {
+            InitCabinPins();
+
+            _openTopoService = openTopoService;
+            _geocodingService = geocodingService;
+            _dialogService = dialogService;
+        }
+
+        [RelayCommand]
+        private async Task PinClicked(MapPinModel pin)
+        {
+            _pinClickInProgress = true;
+            try
+            {
+                var elevation =
+                    await _openTopoService.GetElevationAsync(
+                        pin.Latitude,
+                        pin.Longitude);
+
+                var placementInfo =
+                    await _geocodingService.GetGeocodingPlacemark(
+                        pin.Latitude,
+                        pin.Longitude);
+
+                await _dialogService.ShowAlertAsync(
+                    pin.Label,
+                    $"{pin.Address}\n\nElevation: {elevation}m\n\n{placementInfo}",
+                    "OK");
+            }
+            finally
+            {
+                _pinClickInProgress = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ToggleMeasureMode()
+        {
+            IsMeasuringMode = !IsMeasuringMode; //toggle the measuring mode
+        }
+
+        [RelayCommand]
+        private async Task MapClicked(Location location)
+        {
+            if (_pinClickInProgress)
+            {
+                return;
+            }
+
+            if (IsMeasuringMode)
+            {
+                HandleMeasuringMode(location);
+                return;
+            }
+
+            await HandleDefaultMapClicked(location);
+        }
+
+        private void HandleMeasuringMode(Location location)
+        {
+            if (FirstLocationMeasureMode == null)
+            {
+                FirstLocationMeasureMode = location;
+                return;
+            }
+
+            if (SecondLocationMeasureMode == null)
+            {
+                SecondLocationMeasureMode = location;
+
+                var distance = Location.CalculateDistance(
+                    FirstLocationMeasureMode,
+                    SecondLocationMeasureMode,
+                    DistanceUnits.Kilometers
+                    );
+
+                DistanceMeasuredKm = Math.Round(distance, 1);
+
+                return;
+            }
+
+            //Third click restarts over 
+            FirstLocationMeasureMode = location;
+            SecondLocationMeasureMode = null;
+        }      
+
+        private async Task HandleDefaultMapClicked(Location location)
+        {
+            var elevationOfPoint = await _openTopoService.GetElevationAsync(location.Latitude, location.Longitude);
+            await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", location.Latitude, location.Longitude);
+        }
+
+        private async Task ShowLocationInformationAlert(string label, string address, double latitude, double longitude)
+        {
+            var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
+
+            var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
+
+            await _dialogService.ShowAlertAsync(
+                    label,
+                    address + $"\n\nElevation: {elevationOfPoint} m\n\nGeocoding (Placement) info:\n {placementInfo ?? "<None>"}",
+                    "OK"
+                ); //on click , alert the pin data also via this marker clicked callback 
+        }
+
+        private void InitCabinPins()
+        {
+            foreach (var cabin in TrondheimCabins.GetSampleData())
+            {
+                CabinPins.Add(
+                    new MapPinModel
+                    {
+                        Label = cabin.Name,
+                        Address = cabin.Description,
+                        Latitude = cabin.Latitude,
+                        Longitude = cabin.Longitude
+                    });
+            }
+        }
+
+    }
+}</code></pre>
+</article>
