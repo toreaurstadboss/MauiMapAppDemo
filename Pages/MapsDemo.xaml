@@ -5,27 +5,57 @@
              xmlns:viewmodels="clr-namespace:MauiMapAppDemo.ViewModels"
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:MauiMapAppDemo.Converters"
              xmlns:behaviors="clr-namespace:MauiMapAppDemo.Behaviors"             
              x:DataType="viewmodels:MapsViewModel"
              Title="Maps demo">
 
+    <ContentPage.Resources>
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+    </ContentPage.Resources>
+
+
     <Grid
-       RowDefinitions="Auto,Auto,*">
-        
+       RowDefinitions="Auto,Auto,Auto,*">       
+              
         <Image 
             Grid.Row="0"
             Source="globalcompasslogo.png"
             HeightRequest="180"
             Aspect="AspectFit" />
 
+        <VerticalStackLayout
+            Grid.Row="1">
+            <HorizontalStackLayout>
+
+                <Button
+                    Command="{Binding ToggleMeasureModeCommand}"
+                    CornerRadius="2"
+                    BorderColor="MediumPurple"
+                    BorderWidth="2"
+                    Text="📏Measure distance"
+                    BackgroundColor="{Binding IsMeasuringMode, Converter={StaticResource BoolToColorConverter}}" />
+
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout>
+
+                <Label Text="Distance measured in km:" />
+                <Label IsVisible="{Binding IsMeasuringMode}" Text="{Binding DistanceMeasuredKm}" />
+
+            </HorizontalStackLayout>
+            
+        </VerticalStackLayout>
+
+
         <Label 
-            Grid.Row="1"
+            Grid.Row="2"
             Text="Elevation data from Open Topo Data API with Eudem-25 data set"
             FontAttributes="Italic"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
 
-        <maps:Map Grid.Row="2" 
+        <maps:Map Grid.Row="3" 
                   Margin="2"
                   x:Name="MapCtrl"
                   MapType="Street">

@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using MauiMapAppDemo.Repositories.PinLocations;
 using MauiMapAppDemo.Services;
 using System.Collections.ObjectModel;
-using Microsoft.Maui.Maps;
 
 namespace MauiMapAppDemo.ViewModels
 {
@@ -13,7 +12,20 @@ namespace MauiMapAppDemo.ViewModels
         private readonly OpenTopoService _openTopoService;
         private readonly GeocodingService _geocodingService;
         private readonly DialogService _dialogService;
+
         private bool _pinClickInProgress = false;
+
+        [ObservableProperty]
+        public bool _isMeasuringMode;
+
+        [ObservableProperty]
+        private Location? _firstLocationMeasureMode;
+
+        [ObservableProperty]
+        private Location? _secondLocationMeasureMode;
+
+        [ObservableProperty]
+        private double _distanceMeasuredKm;
 
         public ObservableCollection<MapPinModel> CabinPins { get; } = [];
 
@@ -27,7 +39,6 @@ namespace MauiMapAppDemo.ViewModels
             _geocodingService = geocodingService;
             _dialogService = dialogService;
         }
-
 
         [RelayCommand]
         private async Task PinClicked(MapPinModel pin)
@@ -57,6 +68,12 @@ namespace MauiMapAppDemo.ViewModels
         }
 
         [RelayCommand]
+        private async Task ToggleMeasureMode()
+        {
+            IsMeasuringMode = !IsMeasuringMode; //toggle the measuring mode
+        }
+
+        [RelayCommand]
         private async Task MapClicked(Location location)
         {
             if (_pinClickInProgress)
@@ -64,6 +81,45 @@ namespace MauiMapAppDemo.ViewModels
                 return;
             }
 
+            if (IsMeasuringMode)
+            {
+                HandleMeasuringMode(location);
+                return;
+            }
+
+            await HandleDefaultMapClicked(location);
+        }
+
+        private void HandleMeasuringMode(Location location)
+        {
+            if (FirstLocationMeasureMode == null)
+            {
+                FirstLocationMeasureMode = location;
+                return;
+            }
+
+            if (SecondLocationMeasureMode == null)
+            {
+                SecondLocationMeasureMode = location;
+
+                var distance = Location.CalculateDistance(
+                    FirstLocationMeasureMode,
+                    SecondLocationMeasureMode,
+                    DistanceUnits.Kilometers
+                    );
+
+                DistanceMeasuredKm = Math.Round(distance, 1);
+
+                return;
+            }
+
+            //Third click restarts over 
+            FirstLocationMeasureMode = location;
+            SecondLocationMeasureMode = null;
+        }      
+
+        private async Task HandleDefaultMapClicked(Location location)
+        {
             var elevationOfPoint = await _openTopoService.GetElevationAsync(location.Latitude, location.Longitude);
             await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", location.Latitude, location.Longitude);
         }
