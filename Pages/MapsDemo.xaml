@@ -55,8 +55,9 @@
 
             <HorizontalStackLayout Margin="12" IsVisible="{Binding IsMeasuringMode}">
 
-                <Label Text="Distance measured in km:" HorizontalOptions="Center" />
-                <Label Text="{Binding DistanceMeasuredKm}" />
+                <Label FontAttributes="Bold" Text="Distance measured: " HorizontalOptions="Center" VerticalOptions="Center" />
+                <Label Text="{Binding DistanceMeasuredKm}" TextColor="DarkBlue" FontSize="32" VerticalOptions="Center" />
+                <Label Text=" km" VerticalOptions="Center" />
 
             </HorizontalStackLayout>
             
