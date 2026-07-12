@@ -61,7 +61,7 @@ namespace MauiMapAppDemo.ViewModels
                     $"{pin.Address}\n\nElevation: {elevation}m\n\n{placementInfo}",
                     "OK");
             }
-            catch
+            finally
             {
                 _pinClickInProgress = false;
             }

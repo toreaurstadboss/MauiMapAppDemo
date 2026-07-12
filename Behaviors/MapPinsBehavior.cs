@@ -193,35 +193,43 @@ namespace MauiMapAppDemo.Behaviors
                 return;
             }
 
+            ClearMeasurementGraphics();
+
             if (MeasureStart == null)
             {
                 return;
             }
-
-            _startPin = new Pin
+            else
             {
-                Label = "Start",
-                Address = "Measurement Start",
-                Location = MeasureStart
-                //TODO: Use a Green diode pin icon
-            };
+                _startPin = new Pin
+                {
+                    Label = "Start",
+                    Address = "Measurement Start",
+                    Location = MeasureStart
+                    //TODO: Use a Green diode pin icon
+                };
 
-            _map.Pins.Add(_startPin);
+                _map.Pins.Add(_startPin);
+            }
 
             if (MeasureEnd == null)
             {
                 return;
             }
-
-            _endPin = new Pin
+            else
             {
-                Label = "End",
-                Address = "Measurement End",
-                Location = MeasureEnd
-                //TODO: Use a Green diode pin icon
-            };
 
-            _map.Pins.Add(_endPin);
+
+                _endPin = new Pin
+                {
+                    Label = "End",
+                    Address = "Measurement End",
+                    Location = MeasureEnd
+                    //TODO: Use a Green diode pin icon
+                };
+
+                _map.Pins.Add(_endPin);
+            }
 
             _measurementLine = new Polyline
             {
