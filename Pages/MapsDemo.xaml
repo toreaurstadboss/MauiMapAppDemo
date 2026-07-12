@@ -64,6 +64,9 @@
                     BindingContext="{Binding Source={x:Reference MapCtrl}, Path=BindingContext}"
                     Center="{Binding MapCenter}"
                     PinItems="{Binding CabinPins}" 
+                    IsMeasuringMode="{Binding IsMeasuringMode}"
+                    MeasureStart="{Binding FirstLocationMeasureMode}"
+                    MeasureEnd="{Binding SecondLocationMeasureMode}"
                     MapClickedCommand="{Binding MapClickedCommand}"
                     PinClickedCommand="{Binding PinClickedCommand}" />
             </maps:Map.Behaviors>

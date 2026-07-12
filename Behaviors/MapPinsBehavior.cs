@@ -1,7 +1,6 @@
 ﻿using MauiMapAppDemo.ViewModels;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
-using System.Net.NetworkInformation;
 using System.Windows.Input;
 
 namespace MauiMapAppDemo.Behaviors
@@ -11,6 +10,56 @@ namespace MauiMapAppDemo.Behaviors
     {
 
         private Microsoft.Maui.Controls.Maps.Map? _map;
+
+        private Microsoft.Maui.Controls.Maps.Polyline? _measurementLine;
+
+        private Microsoft.Maui.Controls.Maps.Pin? _startPin;
+        private Microsoft.Maui.Controls.Maps.Pin? _endPin;
+
+
+        public static readonly BindableProperty IsMeasuringModeProperty =
+            BindableProperty.Create(
+                nameof(IsMeasuringMode),
+                typeof(bool),
+                typeof(MapPinsBehavior),
+                false,
+                propertyChanged: OnMeasurementStateChanged);
+
+        public bool IsMeasuringMode
+        {
+            get => (bool)GetValue(IsMeasuringModeProperty);
+            set => SetValue(IsMeasuringModeProperty, value);
+        }
+
+
+        public static readonly BindableProperty MeasureStartProperty =
+            BindableProperty.Create(
+                nameof(MeasureStart),
+                typeof(Location),
+                typeof(MapPinsBehavior),
+                propertyChanged: OnMeasurementChanged
+            );
+
+        public Location MeasureStart
+        {
+            get => (Location)GetValue(MeasureStartProperty);
+            set => SetValue(MeasureStartProperty, value);
+        }
+
+        public static readonly BindableProperty MeasureEndProperty =
+            BindableProperty.Create(
+                nameof(MeasureEnd),
+                typeof(Location),
+                typeof(MapPinsBehavior),
+                propertyChanged: OnMeasurementChanged
+            );
+
+        public Location MeasureEnd
+        {
+            get => (Location)GetValue(MeasureEndProperty);
+            set => SetValue(MeasureEndProperty, value);
+        }
+
 
         public static readonly BindableProperty CenterProperty =
          BindableProperty.Create(
@@ -114,6 +163,78 @@ namespace MauiMapAppDemo.Behaviors
             }
         }
 
+        private static void OnMeasurementChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            ((MapPinsBehavior)bindable).RefreshMeasurementLine();
+        }
+
+
+        private static void OnMeasurementStateChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            var behavior = (MapPinsBehavior)bindable;
+
+            if (!(bool)newValue)
+            {
+                behavior.ClearMeasurementGraphics();
+            }
+        }
+
+
+        private void RefreshMeasurementLine()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            if (MeasureStart == null)
+            {
+                return;
+            }
+
+            _startPin = new Pin
+            {
+                Label = "Start",
+                Address = "Measurement Start",
+                Location = MeasureStart
+                //TODO: Use a Green diode pin icon
+            };
+
+            _map.Pins.Add(_startPin);
+
+            if (MeasureEnd == null)
+            {
+                return;
+            }
+
+            _endPin = new Pin
+            {
+                Label = "End",
+                Address = "Measurement End",
+                Location = MeasureEnd
+                //TODO: Use a Green diode pin icon
+            };
+
+            _map.Pins.Add(_endPin);
+
+            _measurementLine = new Polyline
+            {
+                StrokeColor = Colors.Red,
+                StrokeWidth = 5
+            };
+
+            _measurementLine.Geopath.Add(MeasureStart);
+            _measurementLine.Geopath.Add(MeasureEnd);
+
+            _map.MapElements.Add(_measurementLine);
+        }
+
         private static void OnPinItemsChanged(
             BindableObject bindable,
             object oldValue,
@@ -122,6 +243,32 @@ namespace MauiMapAppDemo.Behaviors
             ((MapPinsBehavior)bindable).RefreshPins();
         }
 
+        private void ClearMeasurementGraphics()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            if (_startPin != null)
+            {
+                _map.Pins.Remove(_startPin);
+            }
+
+            if (_endPin != null)
+            {
+                _map.Pins.Remove(_endPin);
+            }
+
+            if (_measurementLine != null)
+            {
+                _map.MapElements.Remove(_measurementLine);
+            }
+
+            _startPin = null;
+            _endPin = null;
+            _measurementLine = null;
+        }
 
         private void RefreshPins()
         {
