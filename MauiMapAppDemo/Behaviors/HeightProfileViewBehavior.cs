@@ -8,10 +8,20 @@ namespace MauiMapAppDemo.Behaviors
     {
         private GraphicsView? _graphicsView;
 
+        private void OnGraphicsViewBindingContextChanged(object? sender, EventArgs e)
+        {
+            if (_graphicsView != null)
+            {
+                BindingContext = _graphicsView.BindingContext;
+            }
+        }
+
         protected override void OnAttachedTo(GraphicsView bindable)
         {
             base.OnAttachedTo(bindable);
             _graphicsView = bindable;
+            BindingContext = bindable.BindingContext;
+            _graphicsView.BindingContextChanged += OnGraphicsViewBindingContextChanged;
             _graphicsView.Drawable = this;
         }
 
@@ -19,7 +29,9 @@ namespace MauiMapAppDemo.Behaviors
         {
             if (ReferenceEquals(_graphicsView, bindable))
             {
+                _graphicsView.BindingContextChanged -= OnGraphicsViewBindingContextChanged;
                 _graphicsView.Drawable = null;
+                BindingContext = null;
                 _graphicsView = null;
             }
 
