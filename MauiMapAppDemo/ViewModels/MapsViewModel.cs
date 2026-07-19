@@ -32,6 +32,9 @@ namespace MauiMapAppDemo.ViewModels
         [ObservableProperty]
         private double _distanceMeasuredKm;
 
+        [ObservableProperty]
+        private Dictionary<double, double> _heightProfiles = new();
+
         public ObservableCollection<MapPinModel> CabinPins { get; } = [];
 
         public Location MapCenter { get; } = new(63.4305, 10.3951);
@@ -86,6 +89,11 @@ namespace MauiMapAppDemo.ViewModels
         private void ToggleHeightProfile()
         {
             IsHeightProfileMode = !IsHeightProfileMode;
+
+            if (IsHeightProfileMode && !IsMeasuringMode)
+            {
+                IsMeasuringMode = true;
+            }
         }
 
         [RelayCommand]
@@ -104,14 +112,14 @@ namespace MauiMapAppDemo.ViewModels
 
             if (IsMeasuringMode)
             {
-                HandleMeasuringMode(location);
+                await HandleMeasuringMode(location);
                 return;
             }
 
             await HandleDefaultMapClicked(location);
         }
 
-        private void HandleMeasuringMode(Location location)
+        private async Task HandleMeasuringMode(Location location)
         {
             if (FirstLocationMeasureMode == null)
             {
@@ -133,19 +141,61 @@ namespace MauiMapAppDemo.ViewModels
 
                 if (IsHeightProfileMode)
                 {
-                    HandleHeightProfileMode();
+                    await HandleHeightProfileMode();
                 }
 
                 return;
             }
-
+            
             //Third click restarts over 
             FirstLocationMeasureMode = location;
             SecondLocationMeasureMode = null;
         }
 
-        private void HandleHeightProfileMode()
+        private async Task HandleHeightProfileMode()
         {
+            // OpenTopoData Api got these limits 
+            // Max 1000 calls per day
+            // Max 100 locations per request
+            // https://www.opentopodata.org/
+
+            int maxSamples = 10;
+
+            int sleepMillisecondsBetweenRequest = 1050; //sleep at least a second to avoid 429 Too Many Requests
+
+
+            var samples = Math.Max(maxSamples, (int)Math.Min(2, (1.0) * DistanceMeasuredKm / 100));
+
+            var startLocation = FirstLocationMeasureMode!;
+            var endLocation = SecondLocationMeasureMode!;
+
+            var stepLatitude = Math.Abs(endLocation.Latitude - startLocation.Latitude) / samples;
+            var stepLongitude = Math.Abs(endLocation.Longitude - startLocation.Longitude) / samples;
+            var stepProfile = Math.Sqrt(Math.Pow(stepLongitude, 2) + Math.Pow(stepLatitude, 2));
+
+            var currentLatitude = startLocation.Latitude;
+            var currentLongitude = startLocation.Longitude;
+            var currentProfile = 0d;
+            var heightProfiles = new Dictionary<double, double>();
+
+            foreach (var sample in Enumerable.Range(0, samples))
+            {
+                currentLatitude += stepLatitude;
+                currentLongitude += stepLongitude;
+
+                var elevationOfPoint = await _openTopoService.GetElevationAsync(currentLatitude, currentLongitude);
+                if (elevationOfPoint.HasValue)
+                {
+                    heightProfiles[currentProfile] = elevationOfPoint.Value;
+                }
+
+                currentProfile += stepProfile;
+
+                await Task.Delay(sleepMillisecondsBetweenRequest);
+
+            }
+
+            HeightProfiles = heightProfiles;
 
         }
 

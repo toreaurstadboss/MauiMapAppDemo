@@ -73,9 +73,18 @@
             
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsHeightProfileMode}" HeightRequest="100" BackgroundColor="Pink">
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsHeightProfileMode}" HeightRequest="200">
 
             <Label IsVisible="{Binding IsMeasuringMode, Converter={toolkit:InvertedBoolConverter}}" Text="Select points A and B first to show height profile. Choose 'Measure distance' tool." />
+
+            <GraphicsView IsVisible="{Binding IsHeightProfileMode}" HeightRequest="90" MinimumWidthRequest="200">
+                <GraphicsView.Behaviors>
+                    <behaviors:HeightProfileViewBehavior
+                        HeightProfiles="{Binding HeightProfiles}"
+                        MeasureStart="{Binding FirstLocationMeasureMode}"
+                        MeasureEnd="{Binding SecondLocationMeasureMode}" />
+                </GraphicsView.Behaviors>
+            </GraphicsView>
 
         </VerticalStackLayout>
 
