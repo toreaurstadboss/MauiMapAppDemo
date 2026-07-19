@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MauiMapAppDemo.Repositories.PinLocations;
+using MauiMapAppDemo.ViewModels.Messages;
 using MauiMapAppDemo.Services;
 using System.Collections.ObjectModel;
 
@@ -38,6 +40,11 @@ namespace MauiMapAppDemo.ViewModels
             _openTopoService = openTopoService;
             _geocodingService = geocodingService;
             _dialogService = dialogService;
+
+            WeakReferenceMessenger.Default.Register<ToggleMeasureModeMessage>(this, (_, _) =>
+            {
+                ToggleMeasureModeCommand.Execute(null);
+            });
         }
 
         [RelayCommand]
@@ -68,9 +75,9 @@ namespace MauiMapAppDemo.ViewModels
         }
 
         [RelayCommand]
-        private async Task ToggleMeasureMode()
+        private void ToggleMeasureMode()
         {
-            IsMeasuringMode = !IsMeasuringMode; //toggle the measuring mode
+            IsMeasuringMode = !IsMeasuringMode;
         }
 
         [RelayCommand]

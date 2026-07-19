@@ -20,12 +20,12 @@
               
         <VerticalStackLayout
             Grid.Row="0"
-            Margin="12,12,12,0"
-            Spacing="8">
+            Margin="2"
+            Spacing="2">
 
             <Image 
                 Source="globalcompasslogo.png"
-                HeightRequest="180"
+                HeightRequest="50"
                 Aspect="AspectFit"
                 Margin="0" />
 

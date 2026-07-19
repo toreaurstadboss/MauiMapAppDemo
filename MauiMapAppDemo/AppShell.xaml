@@ -4,11 +4,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiMapAppDemo"
-    Title="MauiMapAppDemo">
+    xmlns:pages="clr-namespace:MauiMapAppDemo.Pages"
+    Title="MauiMapAppDemo"
+    FlyoutBehavior="Flyout">
+
+    <MenuItem
+        Text="Toggle measure mode"
+        Command="{Binding ToggleMeasureModeCommand}" />
 
     <ShellContent
         Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        ContentTemplate="{DataTemplate pages:MapsDemo}"
+        Route="MapsPage" />
 
 </Shell>
