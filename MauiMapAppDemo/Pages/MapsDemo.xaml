@@ -16,7 +16,7 @@
 
 
     <Grid
-       RowDefinitions="Auto,Auto,*">       
+       RowDefinitions="Auto,Auto, Auto, *">       
               
         <VerticalStackLayout
             Grid.Row="0"
@@ -51,6 +51,16 @@
                     Text="📏Measure distance"
                     BackgroundColor="{Binding IsMeasuringMode, Converter={StaticResource BoolToColorConverter}}" />
 
+                <Button
+                    Margin="12"
+                    Command="{Binding ToggleHeightProfileCommand}"
+                    CornerRadius="10"
+                    BorderColor="MediumPurple"
+                    BorderWidth="2"
+                    HorizontalOptions="Center"
+                    Text="⛰️Show heights"
+                    BackgroundColor="{Binding IsHeightProfileMode, Converter={StaticResource BoolToColorConverter}}" />
+
             </HorizontalStackLayout>
 
             <HorizontalStackLayout Margin="12" IsVisible="{Binding IsMeasuringMode}">
@@ -63,8 +73,13 @@
             
         </VerticalStackLayout>
 
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsHeightProfileMode}" HeightRequest="100" BackgroundColor="Pink">
 
-        <maps:Map Grid.Row="2" 
+            <Label IsVisible="{Binding IsMeasuringMode, Converter={toolkit:InvertedBoolConverter}}" Text="Select points A and B first to show height profile. Choose 'Measure distance' tool." />
+
+        </VerticalStackLayout>
+
+        <maps:Map Grid.Row="3" 
                   Margin="12"
                   x:Name="MapCtrl"
                   MapType="Street">

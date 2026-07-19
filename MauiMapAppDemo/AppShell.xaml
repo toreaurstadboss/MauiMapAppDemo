@@ -9,8 +9,13 @@
     FlyoutBehavior="Flyout">
 
     <MenuItem
-        Text="Toggle measure mode"
-        Command="{Binding ToggleMeasureModeCommand}" />
+        Text="📏 Toggle measure mode"
+        Command="{Binding ToggleMeasureModeCommand}" />   
+    
+
+    <MenuItem
+     Text="⛰️ Toggle height profile mode"
+     Command="{Binding ToggleHeightProfileCommand}" />
 
     <ShellContent
         Title="Home"

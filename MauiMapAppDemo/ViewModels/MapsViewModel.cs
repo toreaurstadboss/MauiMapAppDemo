@@ -21,6 +21,9 @@ namespace MauiMapAppDemo.ViewModels
         public bool _isMeasuringMode;
 
         [ObservableProperty]
+        public bool _isHeightProfileMode;
+
+        [ObservableProperty]
         private Location? _firstLocationMeasureMode;
 
         [ObservableProperty]
@@ -44,6 +47,11 @@ namespace MauiMapAppDemo.ViewModels
             WeakReferenceMessenger.Default.Register<ToggleMeasureModeMessage>(this, (_, _) =>
             {
                 ToggleMeasureModeCommand.Execute(null);
+            });
+
+            WeakReferenceMessenger.Default.Register<ToggleHeightProfileCommandMessage>(this, (_, _) =>
+            {
+                ToggleHeightProfileCommand.Execute(null);
             });
         }
 
@@ -72,6 +80,12 @@ namespace MauiMapAppDemo.ViewModels
             {
                 _pinClickInProgress = false;
             }
+        }
+
+        [RelayCommand]
+        private void ToggleHeightProfile()
+        {
+            IsHeightProfileMode = !IsHeightProfileMode;
         }
 
         [RelayCommand]
@@ -117,13 +131,23 @@ namespace MauiMapAppDemo.ViewModels
 
                 DistanceMeasuredKm = Math.Round(distance, 1);
 
+                if (IsHeightProfileMode)
+                {
+                    HandleHeightProfileMode();
+                }
+
                 return;
             }
 
             //Third click restarts over 
             FirstLocationMeasureMode = location;
             SecondLocationMeasureMode = null;
-        }      
+        }
+
+        private void HandleHeightProfileMode()
+        {
+
+        }
 
         private async Task HandleDefaultMapClicked(Location location)
         {
