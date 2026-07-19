@@ -11,7 +11,7 @@ namespace MauiMapAppDemo.ViewModels
 
     public partial class MapsViewModel : ObservableObject
     {
-        private readonly OpenTopoService _openTopoService;
+        private readonly IElevationService _elevationService;
         private readonly GeocodingService _geocodingService;
         private readonly DialogService _dialogService;
 
@@ -45,11 +45,11 @@ namespace MauiMapAppDemo.ViewModels
 
         public Location MapCenter { get; } = new(63.4305, 10.3951);
 
-        public MapsViewModel(OpenTopoService openTopoService, GeocodingService geocodingService, DialogService dialogService)
+        public MapsViewModel(IElevationService elevationService, GeocodingService geocodingService, DialogService dialogService)
         {
             InitCabinPins();
 
-            _openTopoService = openTopoService;
+            _elevationService = elevationService;
             _geocodingService = geocodingService;
             _dialogService = dialogService;
 
@@ -71,7 +71,7 @@ namespace MauiMapAppDemo.ViewModels
             try
             {
                 var elevation =
-                    await _openTopoService.GetElevationAsync(
+                    await _elevationService.GetElevationAsync(
                         pin.Latitude,
                         pin.Longitude);
 
@@ -170,8 +170,8 @@ namespace MauiMapAppDemo.ViewModels
 
                 IsBusy = true; //since OpenTopoApi is rate-limited with 1 request per second (..) we show ActivityIndicator
 
-                const int maxSamples = 10;
-                const int sleepMillisecondsBetweenRequest = 1050; //sleep at least a second to avoid 429 Too Many Requests
+                int maxSamples = _elevationService.ProviderName?.Contains("Google") == true ? 50 : 10;
+                int sleepMillisecondsBetweenRequest = _elevationService.ProviderName?.Contains("Google") == true ? 10 : 1050; ; //sleep at least a second to avoid 429 Too Many Requests for OpenTopo
 
                 var samples = maxSamples;
 
@@ -187,7 +187,7 @@ namespace MauiMapAppDemo.ViewModels
                     var currentLongitude = startLocation.Longitude + ((endLocation.Longitude - startLocation.Longitude) * fraction);
                     var currentProfile = DistanceMeasuredKm * fraction;
 
-                    var elevationOfPoint = await _openTopoService.GetElevationAsync(currentLatitude, currentLongitude);
+                    var elevationOfPoint = await _elevationService.GetElevationAsync(currentLatitude, currentLongitude);
                     if (elevationOfPoint.HasValue)
                     {
                         heightProfiles[currentProfile] = elevationOfPoint.Value;
@@ -210,13 +210,13 @@ namespace MauiMapAppDemo.ViewModels
 
         private async Task HandleDefaultMapClicked(Location location)
         {
-            var elevationOfPoint = await _openTopoService.GetElevationAsync(location.Latitude, location.Longitude);
+            var elevationOfPoint = await _elevationService.GetElevationAsync(location.Latitude, location.Longitude);
             await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", location.Latitude, location.Longitude);
         }
 
         private async Task ShowLocationInformationAlert(string label, string address, double latitude, double longitude)
         {
-            var elevationOfPoint = await _openTopoService.GetElevationAsync(latitude, longitude);
+            var elevationOfPoint = await _elevationService.GetElevationAsync(latitude, longitude);
 
             var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
 

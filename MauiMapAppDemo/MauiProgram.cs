@@ -3,7 +3,9 @@ using MauiMapAppDemo.Behaviors;
 using MauiMapAppDemo.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui;
 using Microsoft.Maui.Maps.Handlers;
+using Microsoft.Maui.Storage;
 
 namespace MauiMapAppDemo
 {
@@ -46,6 +48,11 @@ namespace MauiMapAppDemo
             builder.Configuration.AddUserSecrets<App>(); //only set up user secrets when we are doing local debugging
 #endif 
 
+            using (var appSettingsStream = FileSystem.OpenAppPackageFileAsync("appsettings.json").GetAwaiter().GetResult())
+            {
+                builder.Configuration.AddJsonStream(appSettingsStream);
+            }
+
             string azureMapsKey = builder.Configuration["AzureMapsKey"] ?? string.Empty;
             builder.ConfigureEssentials(essentials => essentials.UseMapServiceToken(azureMapsKey));
 
@@ -54,6 +61,15 @@ namespace MauiMapAppDemo
 #endif
 
             builder.Services.AddSingleton<OpenTopoService>();
+            builder.Services.AddSingleton<GoogleElevationService>();
+            builder.Services.AddSingleton<IElevationService>(sp =>
+            {
+                var elevationProvider = builder.Configuration["ElevationProvider"] ?? "OpenTopo";
+
+                return elevationProvider.Equals("Google", StringComparison.OrdinalIgnoreCase)
+                    ? sp.GetRequiredService<GoogleElevationService>()
+                    : sp.GetRequiredService<OpenTopoService>();
+            });
             builder.Services.AddSingleton<GeocodingService>();
             builder.Services.AddSingleton<DialogService>();
 

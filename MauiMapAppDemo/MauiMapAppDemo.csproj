@@ -85,6 +85,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Pages\MapsDemo.xaml.cs">
 	    <DependentUpon>MapsDemo.xaml</DependentUpon>
 	  </Compile>
