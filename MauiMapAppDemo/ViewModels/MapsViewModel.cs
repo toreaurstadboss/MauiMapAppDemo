@@ -33,7 +33,13 @@ namespace MauiMapAppDemo.ViewModels
         private double _distanceMeasuredKm;
 
         [ObservableProperty]
+        private bool _isBusy;
+
+        [ObservableProperty]
         private Dictionary<double, double> _heightProfiles = new();
+
+        [ObservableProperty]
+        private bool _isHeightProfilesUpdated;
 
         public ObservableCollection<MapPinModel> CabinPins { get; } = [];
 
@@ -159,43 +165,46 @@ namespace MauiMapAppDemo.ViewModels
             // Max 100 locations per request
             // https://www.opentopodata.org/
 
-            int maxSamples = 10;
-
-            int sleepMillisecondsBetweenRequest = 1050; //sleep at least a second to avoid 429 Too Many Requests
-
-
-            var samples = Math.Max(maxSamples, (int)Math.Min(2, (1.0) * DistanceMeasuredKm / 100));
-
-            var startLocation = FirstLocationMeasureMode!;
-            var endLocation = SecondLocationMeasureMode!;
-
-            var stepLatitude = Math.Abs(endLocation.Latitude - startLocation.Latitude) / samples;
-            var stepLongitude = Math.Abs(endLocation.Longitude - startLocation.Longitude) / samples;
-            var stepProfile = Math.Sqrt(Math.Pow(stepLongitude, 2) + Math.Pow(stepLatitude, 2));
-
-            var currentLatitude = startLocation.Latitude;
-            var currentLongitude = startLocation.Longitude;
-            var currentProfile = 0d;
-            var heightProfiles = new Dictionary<double, double>();
-
-            foreach (var sample in Enumerable.Range(0, samples))
+            try
             {
-                currentLatitude += stepLatitude;
-                currentLongitude += stepLongitude;
 
-                var elevationOfPoint = await _openTopoService.GetElevationAsync(currentLatitude, currentLongitude);
-                if (elevationOfPoint.HasValue)
+                IsBusy = true; //since OpenTopoApi is rate-limited with 1 request per second (..) we show ActivityIndicator
+
+                const int maxSamples = 10;
+                const int sleepMillisecondsBetweenRequest = 1050; //sleep at least a second to avoid 429 Too Many Requests
+
+                var samples = maxSamples;
+
+                var startLocation = FirstLocationMeasureMode!;
+                var endLocation = SecondLocationMeasureMode!;
+
+                var heightProfiles = new Dictionary<double, double>();
+
+                for (var sampleIndex = 0; sampleIndex < samples; sampleIndex++)
                 {
-                    heightProfiles[currentProfile] = elevationOfPoint.Value;
+                    var fraction = samples == 1 ? 0d : sampleIndex / (double)(samples - 1);
+                    var currentLatitude = startLocation.Latitude + ((endLocation.Latitude - startLocation.Latitude) * fraction);
+                    var currentLongitude = startLocation.Longitude + ((endLocation.Longitude - startLocation.Longitude) * fraction);
+                    var currentProfile = DistanceMeasuredKm * fraction;
+
+                    var elevationOfPoint = await _openTopoService.GetElevationAsync(currentLatitude, currentLongitude);
+                    if (elevationOfPoint.HasValue)
+                    {
+                        heightProfiles[currentProfile] = elevationOfPoint.Value;
+                    }
+
+                    await Task.Delay(sleepMillisecondsBetweenRequest);
+
                 }
 
-                currentProfile += stepProfile;
-
-                await Task.Delay(sleepMillisecondsBetweenRequest);
+                HeightProfiles = heightProfiles;
+                IsHeightProfilesUpdated = !IsHeightProfilesUpdated;
 
             }
-
-            HeightProfiles = heightProfiles;
+            finally
+            {
+                IsBusy = false;
+            }
 
         }
 

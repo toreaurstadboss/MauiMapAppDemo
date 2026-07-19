@@ -16,7 +16,7 @@
 
 
     <Grid
-       RowDefinitions="Auto,Auto, Auto, *">       
+       RowDefinitions="Auto, Auto, Auto, *">       
               
         <VerticalStackLayout
             Grid.Row="0"
@@ -63,7 +63,7 @@
 
             </HorizontalStackLayout>
 
-            <HorizontalStackLayout Margin="12" IsVisible="{Binding IsMeasuringMode}">
+            <HorizontalStackLayout Margin="2" IsVisible="{Binding IsMeasuringMode}">
 
                 <Label FontAttributes="Bold" Text="Distance measured: " HorizontalOptions="Center" VerticalOptions="Center" />
                 <Label Text="{Binding DistanceMeasuredKm}" TextColor="DarkBlue" FontSize="32" VerticalOptions="Center" />
@@ -73,11 +73,13 @@
             
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsHeightProfileMode}" HeightRequest="200">
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsHeightProfileMode}" HeightRequest="200" Margin="40">
 
-            <Label IsVisible="{Binding IsMeasuringMode, Converter={toolkit:InvertedBoolConverter}}" Text="Select points A and B first to show height profile. Choose 'Measure distance' tool." />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" />
 
-            <GraphicsView IsVisible="{Binding IsHeightProfileMode}" HeightRequest="90" MinimumWidthRequest="200">
+            <!--<Label IsVisible="{Binding IsMeasuringMode, Converter={toolkit:InvertedBoolConverter}}" Text="Select points A and B first to show height profile. Choose 'Measure distance' tool." />-->
+
+            <GraphicsView IsVisible="{Binding IsHeightProfileMode}" HeightRequest="190" Margin="10">
                 <GraphicsView.Behaviors>
                     <behaviors:HeightProfileViewBehavior
                         HeightProfiles="{Binding HeightProfiles}"
