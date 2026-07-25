@@ -5,6 +5,7 @@ using MauiMapAppDemo.Repositories.PinLocations;
 using MauiMapAppDemo.ViewModels.Messages;
 using MauiMapAppDemo.Services;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Maui.Alerts;
 
 namespace MauiMapAppDemo.ViewModels
 {
@@ -211,20 +212,62 @@ namespace MauiMapAppDemo.ViewModels
         private async Task HandleDefaultMapClicked(Location location)
         {
             var elevationOfPoint = await _elevationService.GetElevationAsync(location.Latitude, location.Longitude);
-            await ShowLocationInformationAlert($"Clicked point in the map:", $"Showing elevation of clicked point:", location.Latitude, location.Longitude);
+            await ShowLocationInformationAlert("🚩Clicked point in the map", location.Latitude, location.Longitude);
         }
 
-        private async Task ShowLocationInformationAlert(string label, string address, double latitude, double longitude)
+        private async Task ShowLocationInformationAlert(string label, double latitude, double longitude)
         {
             var elevationOfPoint = await _elevationService.GetElevationAsync(latitude, longitude);
 
             var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
 
-            await _dialogService.ShowAlertAsync(
-                    label,
-                    address + $"\n\nElevation: {elevationOfPoint} m\n\nGeocoding (Placement) info:\n {placementInfo ?? "<None>"}",
-                    "OK"
-                ); //on click , alert the pin data also via this marker clicked callback 
+            var latitudeHemisphere = latitude >= 0 ? "N" : "S";
+            var longitudeHemisphere = longitude >= 0 && longitude < 180 ? "E" : "W";
+
+            string pointClickedMessageInfo = $"""
+               🧭 Position:
+               Latitude: {latitude:F6}° {latitudeHemisphere}
+               Longitude: {longitude:F6}° {longitudeHemisphere}
+           
+               🏔️ Elevation: {elevationOfPoint} m
+           
+               ℹ️Geocoding (Placement) info:
+               {placementInfo ?? "<None>"}
+               """;
+
+            const string showDetails = "🗺️Show details about point ➡️";
+
+            const string copyLat = "📋 Copy latitude";
+            const string copyLong = "📋Copy longitude";
+            const string copyLatLong = "📋Copy latitude+longitude";
+            
+
+            var chosenAction = await _dialogService.ShowActionSheetAsync(label, "Select an option ⬇️",
+               showDetails, copyLat, copyLong, copyLatLong);
+
+            bool copiedToClipboard = new[] { copyLat, copyLong, copyLatLong }.Contains(chosenAction);
+            switch (chosenAction)
+            {
+                case copyLat:
+                    await Clipboard.SetTextAsync($"{latitude}");
+                    break;
+                case copyLong:
+                    await Clipboard.SetTextAsync($"{longitude}");
+                    break;
+                case copyLatLong:
+                    await Clipboard.SetTextAsync($"{latitude},{longitude}");
+                    break;
+            }
+
+            if (copiedToClipboard)
+            {
+                Toast.Make($"✅ Copied coordinates to clipboard: {chosenAction}!", CommunityToolkit.Maui.Core.ToastDuration.Short, 18);
+            }   
+            
+            if (chosenAction == showDetails)
+            {
+                await _dialogService.ShowAlertAsync(label, pointClickedMessageInfo);
+            }
         }
 
         private void InitCabinPins()
