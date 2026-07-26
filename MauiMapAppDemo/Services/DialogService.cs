@@ -1,4 +1,9 @@
-﻿namespace MauiMapAppDemo.Services
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
+using MauiMapAppDemo.Views;
+
+namespace MauiMapAppDemo.Services
 {
 
     public class DialogService
@@ -16,6 +21,18 @@
         {
             return await Shell.Current.DisplayActionSheetAsync($"{title}\n\n{message}", "OK", null,
                 buttons);
+        }
+
+        public async Task ShowKartverketInfoPopupAsync(double latitude, double longitude, KartverketPunktResponse? response)
+        {
+            var popup = new KartverketInfoPopup(latitude, longitude, response);
+
+            await Shell.Current.ShowPopupAsync(
+                popup,
+                new PopupOptions
+                {
+                    CanBeDismissedByTappingOutsideOfPopup = true
+                });
         }
 
     }

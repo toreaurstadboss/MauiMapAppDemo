@@ -1,0 +1,189 @@
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+              xmlns:viewmodels="clr-namespace:MauiMapAppDemo.ViewModels"
+              x:Class="MauiMapAppDemo.Views.KartverketInfoPopup"
+              Padding="0"
+              CanBeDismissedByTappingOutsideOfPopup="True">
+
+    <Grid Padding="16">
+        <Border
+            BackgroundColor="#FFFDF9"
+            Stroke="#E6D9C9"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 24"
+            Padding="18">
+
+            <Border.Shadow>
+                <Shadow Brush="#22000000" Radius="18" Offset="0,8" Opacity="0.2" />
+            </Border.Shadow>
+
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding Title}"
+                           FontAttributes="Bold"
+                           FontSize="22"
+                           TextColor="#1F2A37" />
+
+                    <Label Text="{Binding Subtitle}"
+                           FontSize="13"
+                           TextColor="#5F6B7A" />
+
+                    <Border BackgroundColor="#EEF7F2"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="10,8">
+                        <Label Text="{Binding StatusText}"
+                               FontAttributes="Bold"
+                               TextColor="#166534" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+                    <VerticalStackLayout Spacing="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="📋 Høydepunkter"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="#1F2A37" />
+
+                            <Border BackgroundColor="#FFFFFF"
+                                    Stroke="#E7E1D8"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 18"
+                                    Padding="10">
+
+                                <VerticalStackLayout Spacing="10"
+                                                     BindableLayout.ItemsSource="{Binding SummaryRows}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:KartverketPopupRow">
+                                            <Border Stroke="#F2EDE6"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 14"
+                                                    BackgroundColor="#FFFEFC"
+                                                    Padding="12">
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                    <Label Text="{Binding Icon}"
+                                                           FontSize="18"
+                                                           VerticalOptions="Start" />
+
+                                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                        <Label Text="{Binding Label}"
+                                                               FontAttributes="Bold"
+                                                               TextColor="#233142" />
+
+                                                        <Label Text="{Binding Description}"
+                                                               FontSize="12"
+                                                               LineBreakMode="WordWrap"
+                                                               TextColor="#6B7280" />
+                                                    </VerticalStackLayout>
+
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Value}"
+                                                           HorizontalTextAlignment="End"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#0F172A" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8"
+                                             IsVisible="{Binding HasDetailRows}">
+                            <Label Text="🧾 Detaljer"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="#1F2A37" />
+
+                            <Border BackgroundColor="#FFFFFF"
+                                    Stroke="#E7E1D8"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 18"
+                                    Padding="10">
+
+                                <VerticalStackLayout Spacing="8"
+                                                     BindableLayout.ItemsSource="{Binding DetailRows}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:KartverketPopupRow">
+                                            <Grid ColumnDefinitions="Auto,*,Auto"
+                                                  ColumnSpacing="10"
+                                                  Padding="2,8">
+                                                <Label Text="{Binding Icon}"
+                                                       FontSize="16"
+                                                       VerticalOptions="Start" />
+
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                    <Label Text="{Binding Label}"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#334155" />
+
+                                                    <Label Text="{Binding Description}"
+                                                           FontSize="12"
+                                                           LineBreakMode="WordWrap"
+                                                           TextColor="#6B7280" />
+                                                </VerticalStackLayout>
+
+                                                <Label Grid.Column="2"
+                                                       Text="{Binding Value}"
+                                                       HorizontalTextAlignment="End"
+                                                       VerticalOptions="Start"
+                                                       TextColor="#0F172A" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="💡 Hva betyr feltene?"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="#1F2A37" />
+
+                            <VerticalStackLayout Spacing="8"
+                                                 BindableLayout.ItemsSource="{Binding Explanations}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="viewmodels:KartverketPopupExplanation">
+                                        <Border Stroke="#E7E1D8"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 14"
+                                                BackgroundColor="#FAFAF8"
+                                                Padding="12">
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                                <Label Text="{Binding Icon}" FontSize="16" VerticalOptions="Start" />
+
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                    <Label Text="{Binding Label}"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#334155" />
+
+                                                    <Label Text="{Binding Description}"
+                                                           FontSize="12"
+                                                           LineBreakMode="WordWrap"
+                                                           TextColor="#6B7280" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <Button Grid.Row="2"
+                        Text="Lukk"
+                        Clicked="OnCloseClicked"
+                        BackgroundColor="#1F6F78"
+                        TextColor="White"
+                        CornerRadius="14"
+                        HorizontalOptions="End"
+                        Padding="18,12" />
+            </Grid>
+        </Border>
+    </Grid>
+</toolkit:Popup>

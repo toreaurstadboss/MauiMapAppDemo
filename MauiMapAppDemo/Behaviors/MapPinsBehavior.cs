@@ -17,6 +17,20 @@ namespace MauiMapAppDemo.Behaviors
         private Microsoft.Maui.Controls.Maps.Pin? _endPin;
 
 
+        public static readonly BindableProperty IsMatrikkelModeProperty =
+            BindableProperty.Create(
+                nameof(IsMatrikkelMode),
+                typeof(bool),
+                typeof(MapPinsBehavior),
+                false);
+
+        public bool IsMatrikkelMode
+        {
+            get => (bool)GetValue(IsMatrikkelModeProperty);
+            set => SetValue(IsMatrikkelModeProperty, value);
+        }
+
+
         public static readonly BindableProperty IsMeasuringModeProperty =
             BindableProperty.Create(
                 nameof(IsMeasuringMode),

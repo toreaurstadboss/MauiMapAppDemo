@@ -15,14 +15,21 @@ namespace MauiMapAppDemo.ViewModels
         private readonly IElevationService _elevationService;
         private readonly GeocodingService _geocodingService;
         private readonly DialogService _dialogService;
+        private readonly KartverketService _kartverketService;
 
         private bool _pinClickInProgress = false;
+
+        [ObservableProperty]
+        private Location _mapCenter;
 
         [ObservableProperty]
         public bool _isMeasuringMode;
 
         [ObservableProperty]
         public bool _isHeightProfileMode;
+
+        [ObservableProperty]
+        public bool _isMatrikkelMode;
 
         [ObservableProperty]
         private Location? _firstLocationMeasureMode;
@@ -44,15 +51,14 @@ namespace MauiMapAppDemo.ViewModels
 
         public ObservableCollection<MapPinModel> CabinPins { get; } = [];
 
-        public Location MapCenter { get; } = new(63.4305, 10.3951);
-
-        public MapsViewModel(IElevationService elevationService, GeocodingService geocodingService, DialogService dialogService)
+        public MapsViewModel(IElevationService elevationService, GeocodingService geocodingService, DialogService dialogService, KartverketService kartverketService)
         {
             InitCabinPins();
 
             _elevationService = elevationService;
             _geocodingService = geocodingService;
             _dialogService = dialogService;
+            _kartverketService = kartverketService;
 
             WeakReferenceMessenger.Default.Register<ToggleMeasureModeMessage>(this, (_, _) =>
             {
@@ -63,6 +69,19 @@ namespace MauiMapAppDemo.ViewModels
             {
                 ToggleHeightProfileCommand.Execute(null);
             });
+
+            WeakReferenceMessenger.Default.Register<ToggleMatrikkelInfoCommandMessage> (this, (_, _) =>
+            {
+                ToggleShowMatrikkelInformationCommand.Execute(null);
+            });
+
+            InitMapCenterLocation();
+
+        }
+
+        private void InitMapCenterLocation()
+        {
+            MapCenter = new Location(63.4305, 10.3951); //init to center over Trondheim, Norway
         }
 
         [RelayCommand]
@@ -91,6 +110,15 @@ namespace MauiMapAppDemo.ViewModels
                 _pinClickInProgress = false;
             }
         }
+
+        [RelayCommand]
+        private void ToggleShowMatrikkelInformation()
+        {
+            IsMeasuringMode = false;
+            IsHeightProfileMode = false;
+            IsMatrikkelMode = !IsMatrikkelMode;
+        }
+
 
         [RelayCommand]
         private void ToggleHeightProfile()
@@ -237,13 +265,15 @@ namespace MauiMapAppDemo.ViewModels
 
             const string showDetails = "🗺️Show details about point ➡️";
 
+            const string showMatrikkelInformation = "🧭Show matrikkel info";
+
             const string copyLat = "📋 Copy latitude";
             const string copyLong = "📋Copy longitude";
             const string copyLatLong = "📋Copy latitude+longitude";
             
 
             var chosenAction = await _dialogService.ShowActionSheetAsync(label, "Select an option ⬇️",
-               showDetails, copyLat, copyLong, copyLatLong);
+               showDetails, copyLat, copyLong, copyLatLong, IsMatrikkelMode ? showMatrikkelInformation : string.Empty);
 
             bool copiedToClipboard = new[] { copyLat, copyLong, copyLatLong }.Contains(chosenAction);
             switch (chosenAction)
@@ -268,6 +298,17 @@ namespace MauiMapAppDemo.ViewModels
             {
                 await _dialogService.ShowAlertAsync(label, pointClickedMessageInfo);
             }
+
+            if (chosenAction == showMatrikkelInformation)
+            {
+                await ShowMatrikkelInformationAsync(latitude, longitude);
+            }
+        }
+
+        private async Task ShowMatrikkelInformationAsync(double latitude, double longitude)
+        {
+            var kartverketResponse = await _kartverketService.GetMatrikkelInformationFromLocationAsync(latitude, longitude);
+            await _dialogService.ShowKartverketInfoPopupAsync(latitude, longitude, kartverketResponse);
         }
 
         private void InitCabinPins()

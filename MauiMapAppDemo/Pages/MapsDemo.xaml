@@ -42,24 +42,31 @@
             <HorizontalStackLayout>
 
                 <Button
-                    Margin="12"
+                    Margin="2"
                     Command="{Binding ToggleMeasureModeCommand}"
                     CornerRadius="10"
                     BorderColor="MediumPurple"
                     BorderWidth="2"
-                    HorizontalOptions="Center"
-                    Text="📏Measure distance"
+                    Text="📏Distance"
                     BackgroundColor="{Binding IsMeasuringMode, Converter={StaticResource BoolToColorConverter}}" />
 
                 <Button
-                    Margin="12"
+                    Margin="2"
                     Command="{Binding ToggleHeightProfileCommand}"
                     CornerRadius="10"
                     BorderColor="MediumPurple"
                     BorderWidth="2"
-                    HorizontalOptions="Center"
-                    Text="⛰️Show heights"
+                    Text="⛰️Elevation profile"
                     BackgroundColor="{Binding IsHeightProfileMode, Converter={StaticResource BoolToColorConverter}}" />
+
+                <Button
+                    Margin="2"
+                    Command="{Binding ToggleShowMatrikkelInformationCommand}"
+                    CornerRadius="10"
+                    BorderColor="MediumPurple"
+                    BorderWidth="2"
+                    BackgroundColor="{Binding IsMatrikkelMode, Converter={StaticResource BoolToColorConverter}}" 
+                    Text="ℹ️Matrikkel info" />
 
             </HorizontalStackLayout>
 
@@ -100,6 +107,7 @@
                     Center="{Binding MapCenter}"
                     PinItems="{Binding CabinPins}" 
                     IsMeasuringMode="{Binding IsMeasuringMode}"
+                    IsMatrikkelMode="{Binding IsMatrikkelMode}"
                     MeasureStart="{Binding FirstLocationMeasureMode}"
                     MeasureEnd="{Binding SecondLocationMeasureMode}"
                     MapClickedCommand="{Binding MapClickedCommand}"

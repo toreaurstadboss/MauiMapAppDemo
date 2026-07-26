@@ -7,8 +7,8 @@ namespace MauiMapAppDemo
     {
         public AppShell()
         {
-            InitializeComponent();
             BindingContext = new ShellViewModel();
+            InitializeComponent();
         }
     }
 }

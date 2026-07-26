@@ -72,6 +72,7 @@ namespace MauiMapAppDemo
             });
             builder.Services.AddSingleton<GeocodingService>();
             builder.Services.AddSingleton<DialogService>();
+            builder.Services.AddSingleton<KartverketService>();
 
             return builder.Build();
         }
