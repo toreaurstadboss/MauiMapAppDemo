@@ -1,0 +1,61 @@
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+              x:Class="MauiMapAppDemo.Views.InspectLocationConfirmationPopup"
+              x:TypeArguments="x:Boolean"
+              Padding="0">
+
+    <Grid Padding="16">
+        <Border BackgroundColor="#FFFDF9"
+                Stroke="#E6D9C9"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 24"
+                Padding="18">
+
+            <Border.Shadow>
+                <Shadow Brush="#22000000" Radius="18" Offset="0,8" Opacity="0.2" />
+            </Border.Shadow>
+
+            <VerticalStackLayout Spacing="16">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Inspect this location?"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="#1F2A37"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="⌛ Choose Yes within 5 seconds to inspect the clicked point in the MAP further"
+                           FontSize="13"
+                           TextColor="#5F6B7A"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <Border BackgroundColor="#EEF7F2"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="10,8">
+                    <Label Text="{Binding CountdownText}"
+                           FontAttributes="Bold"
+                           TextColor="#166534"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <Button Text="Yes"
+                            Clicked="OnYesClicked"
+                            BackgroundColor="#1F6F78"
+                            TextColor="White"
+                            CornerRadius="14"
+                            Padding="18,12" />
+
+                    <Button Text="No"
+                            Clicked="OnNoClicked"
+                            BackgroundColor="#B91C1C"
+                            TextColor="White"
+                            CornerRadius="14"
+                            Padding="18,12" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</toolkit:Popup>
