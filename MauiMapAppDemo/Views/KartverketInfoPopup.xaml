@@ -44,7 +44,7 @@
                         <VerticalStackLayout Spacing="8">
                             <Label Text="📋 Høydepunkter"
                                    FontAttributes="Bold"
-                                   FontSize="16"
+                                   FontSize="14"
                                    TextColor="#1F2A37" />
 
                             <Border BackgroundColor="#FFFFFF"
@@ -62,9 +62,9 @@
                                                     StrokeShape="RoundRectangle 14"
                                                     BackgroundColor="#FFFEFC"
                                                     Padding="12">
-                                                <Grid ColumnDefinitions="30,200,Auto" ColumnSpacing="10">
+                                                <Grid ColumnDefinitions="30,200,Auto" ColumnSpacing="2">
                                                     <Label Text="{Binding Icon}"
-                                                           FontSize="18"
+                                                           FontSize="14"
                                                            VerticalOptions="Start" />
 
                                                     <VerticalStackLayout Grid.Column="1" Spacing="2">
@@ -95,7 +95,7 @@
                                              IsVisible="{Binding HasDetailRows}">
                             <Label Text="🧾 Detaljer"
                                    FontAttributes="Bold"
-                                   FontSize="16"
+                                   FontSize="14"
                                    TextColor="#1F2A37" />
 
                             <Border BackgroundColor="#FFFFFF"
@@ -141,7 +141,7 @@
                         <VerticalStackLayout Spacing="8">
                             <Label Text="💡 Hva betyr feltene?"
                                    FontAttributes="Bold"
-                                   FontSize="16"
+                                   FontSize="14"
                                    TextColor="#1F2A37" />
 
                             <VerticalStackLayout Spacing="8"
