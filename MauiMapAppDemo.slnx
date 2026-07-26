@@ -2,6 +2,15 @@
   <Folder Name="/Docs/">
     <File Path="Readme.md" />
   </Folder>
+  <Folder Name="/Screenshots/">
+    <File Path="MauiAppdemo1.png" />
+    <File Path="MauiAppDemo2.png" />
+    <File Path="MauiMapAppDemo/Docs/Screenshot1.png" />
+    <File Path="MauiMapAppDemo/Docs/Screenshot3.png" />
+    <File Path="MauiMapAppDemo/Docs/Screenshot4.png" />
+    <File Path="MauiMapAppDemo/Docs/Screenshot5.png" />
+    <File Path="MauiMapAppDemo/Docs/Shreenshot2.png" />
+  </Folder>
   <Project Path="MauiMapAppDemo/MauiMapAppDemo.csproj">
     <Deploy Solution="Debug|*" />
   </Project>

@@ -115,6 +115,8 @@ Local development uses user secrets for keys and tokens.
 
 ![Map demo screenshot 1](MauiMapAppDemo/Docs/Screenshot1.png)
 
+![Map demo screenshot 1](MauiMapAppDemo/Docs/Screenshot2.png)
+
 ![Map demo screenshot 3](MauiMapAppDemo/Docs/Screenshot3.png)
 
 ![Map demo screenshot 4](MauiMapAppDemo/Docs/Screenshot4.png)
