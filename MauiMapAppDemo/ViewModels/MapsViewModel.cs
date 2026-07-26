@@ -270,7 +270,16 @@ namespace MauiMapAppDemo.ViewModels
             const string copyLat = "📋 Copy latitude";
             const string copyLong = "📋Copy longitude";
             const string copyLatLong = "📋Copy latitude+longitude";
-            
+
+            //first show the point details 
+
+            await _dialogService.ShowAlertAsync(label, pointClickedMessageInfo);
+
+            var shouldInspectLocation = await _dialogService.ShowInspectLocationConfirmationPopupAsync(label);
+            if (!shouldInspectLocation)
+            {
+                return;
+            }
 
             var chosenAction = await _dialogService.ShowActionSheetAsync(label, "Select an option ⬇️",
                showDetails, copyLat, copyLong, copyLatLong, IsMatrikkelMode ? showMatrikkelInformation : string.Empty);

@@ -23,6 +23,20 @@ namespace MauiMapAppDemo.Services
                 buttons);
         }
 
+        public async Task<bool> ShowInspectLocationConfirmationPopupAsync(string title)
+        {
+            var popup = new InspectLocationConfirmationPopup(title);
+
+            var result = await Shell.Current.ShowPopupAsync<bool>(
+                popup,
+                new PopupOptions
+                {
+                    CanBeDismissedByTappingOutsideOfPopup = false
+                });
+
+            return result.Result;
+        }
+
         public async Task ShowKartverketInfoPopupAsync(double latitude, double longitude, KartverketPunktResponse? response)
         {
             var popup = new KartverketInfoPopup(latitude, longitude, response);

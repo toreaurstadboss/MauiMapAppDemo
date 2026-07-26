@@ -18,7 +18,7 @@
 
     <MenuItem
         Text="🧭 Toggle Matrikkel info mode"
-        Command="{Binding ToggleMatrikkelInfoCommandMessage}" />
+        Command="{Binding ToggleMatrikkelInfoModeCommand}" />
 
     <ShellContent
         Title="Home"

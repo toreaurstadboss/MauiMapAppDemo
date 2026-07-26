@@ -62,7 +62,7 @@
                                                     StrokeShape="RoundRectangle 14"
                                                     BackgroundColor="#FFFEFC"
                                                     Padding="12">
-                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                <Grid ColumnDefinitions="30,200,Auto" ColumnSpacing="10">
                                                     <Label Text="{Binding Icon}"
                                                            FontSize="18"
                                                            VerticalOptions="Start" />
@@ -108,11 +108,11 @@
                                                      BindableLayout.ItemsSource="{Binding DetailRows}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="viewmodels:KartverketPopupRow">
-                                            <Grid ColumnDefinitions="Auto,*,Auto"
-                                                  ColumnSpacing="10"
-                                                  Padding="2,8">
+                                            <Grid ColumnDefinitions="25,130,*"
+                                                  ColumnSpacing="2"
+                                                  Padding="2,12">
                                                 <Label Text="{Binding Icon}"
-                                                       FontSize="16"
+                                                       FontSize="20"
                                                        VerticalOptions="Start" />
 
                                                 <VerticalStackLayout Grid.Column="1" Spacing="2">
