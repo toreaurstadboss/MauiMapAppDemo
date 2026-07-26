@@ -1,3 +1,8 @@
 <Solution>
-  <Project Path="MauiMapAppDemo/MauiMapAppDemo.csproj" />
+  <Folder Name="/Docs/">
+    <File Path="Readme.md" />
+  </Folder>
+  <Project Path="MauiMapAppDemo/MauiMapAppDemo.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

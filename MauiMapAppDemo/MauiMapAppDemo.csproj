@@ -100,6 +100,10 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Docs\" />
+	</ItemGroup>
+
 	<!-- This target executes right before the Android Manifest step -->
 	<Target Name="InjectManifestSecrets" BeforeTargets="_GenerateAndroidResourceDir">
 		<PropertyGroup>
