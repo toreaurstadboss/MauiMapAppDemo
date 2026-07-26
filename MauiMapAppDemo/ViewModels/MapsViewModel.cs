@@ -20,7 +20,7 @@ namespace MauiMapAppDemo.ViewModels
         private bool _pinClickInProgress = false;
 
         [ObservableProperty]
-        private Location _mapCenter;
+        private Location _mapCenter = new(63.4305, 10.3951);
 
         [ObservableProperty]
         public bool _isMeasuringMode;
@@ -239,15 +239,15 @@ namespace MauiMapAppDemo.ViewModels
 
         private async Task HandleDefaultMapClicked(Location location)
         {
-            var elevationOfPoint = await _elevationService.GetElevationAsync(location.Latitude, location.Longitude);
-            await ShowLocationInformationAlert("🚩Clicked point in the map", location.Latitude, location.Longitude);
+            await ShowLocationInformationAlert(location.Latitude, location.Longitude);
         }
 
-        private async Task ShowLocationInformationAlert(string label, double latitude, double longitude)
+        private async Task ShowLocationInformationAlert(double latitude, double longitude)
         {
             var elevationOfPoint = await _elevationService.GetElevationAsync(latitude, longitude);
 
             var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
+            var label = BuildLocationLabel(latitude, longitude, placementInfo);
 
             var latitudeHemisphere = latitude >= 0 ? "N" : "S";
             var longitudeHemisphere = longitude >= 0 && longitude < 180 ? "E" : "W";
@@ -303,6 +303,31 @@ namespace MauiMapAppDemo.ViewModels
             {
                 await ShowMatrikkelInformationAsync(latitude, longitude);
             }
+        }
+
+        private static string BuildLocationLabel(double latitude, double longitude, string? placementInfo)
+        {
+            var coordinateLabel = $"{latitude:F6}, {longitude:F6}";
+            var placemarkLine = GetFirstLine(placementInfo);
+
+            if (string.IsNullOrWhiteSpace(placemarkLine))
+            {
+                return $"🚩 {coordinateLabel}";
+            }
+
+            return $"🚩 {coordinateLabel} · {placemarkLine}";
+        }
+
+        private static string? GetFirstLine(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            return value
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault();
         }
 
         private async Task ShowMatrikkelInformationAsync(double latitude, double longitude)

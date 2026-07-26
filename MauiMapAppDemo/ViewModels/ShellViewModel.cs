@@ -21,6 +21,13 @@ namespace MauiMapAppDemo.ViewModels
             WeakReferenceMessenger.Default.Send(new ToggleHeightProfileCommandMessage());
         }
 
+        [RelayCommand]
+        private async Task ToggleMatrikkelInfoModeAsync()
+        {
+            await NavigateToMapsDemoAsync();
+            WeakReferenceMessenger.Default.Send(new ToggleMatrikkelInfoCommandMessage());
+        }
+
         private static async Task NavigateToMapsDemoAsync()
         {
             var currentLocation = Shell.Current?.CurrentState.Location.OriginalString;

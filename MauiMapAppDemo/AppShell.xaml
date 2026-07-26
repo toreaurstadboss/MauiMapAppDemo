@@ -10,12 +10,15 @@
 
     <MenuItem
         Text="📏 Toggle measure mode"
-        Command="{Binding ToggleMeasureModeCommand}" />   
+        Command="{Binding ToggleMeasureModeCommand}" />  
     
-
     <MenuItem
      Text="⛰️ Toggle height profile mode"
      Command="{Binding ToggleHeightProfileCommand}" />
+
+    <MenuItem
+        Text="🧭 Toggle Matrikkel info mode"
+        Command="{Binding ToggleMatrikkelInfoCommandMessage}" />
 
     <ShellContent
         Title="Home"
