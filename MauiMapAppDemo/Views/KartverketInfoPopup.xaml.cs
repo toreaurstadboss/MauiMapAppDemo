@@ -13,8 +13,8 @@ public partial class KartverketInfoPopup : Popup
         BindingContext = new KartverketInfoPopupViewModel(latitude, longitude, response);
     }
 
-    private async Task OnCloseClicked(object? sender, EventArgs e)
+    private void OnCloseClicked(object? sender, EventArgs e)
     {
-        await this.CloseAsync();
+        this.CloseAsync();
     }
 }
