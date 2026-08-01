@@ -107,7 +107,8 @@ namespace MauiMapAppDemo.ViewModels
 
             if (hit != null)
             {
-                rows.Add(new KartverketPopupRow("📐", "Beregnet areal", kartverketOmraadeResponse?.TotalAreaOfAllAreas.ToString() ?? "<ukjent>", "Beregnet areal av eiendommen"));
+                rows.Add(new KartverketPopupRow("📐", "Beregnet areal", kartverketOmraadeResponse?.TotalAreaOfAllAreas.HasValue == true ? kartverketOmraadeResponse.TotalAreaOfAllAreas.Value.ToString("F1") : "<ukjent>", "Beregnet areal av eiendommen"));
+                rows.Add(new KartverketPopupRow("📐", "Beregnet areal i mål (1000 kvm)", kartverketOmraadeResponse?.TotalAreaOfAllAreas.HasValue == true ? (kartverketOmraadeResponse.TotalAreaOfAllAreas.Value / 1000.0).ToString("F1") : "<ukjent>", "Beregnet areal av eiendommen"));
                 rows.Add(new KartverketPopupRow("🏛️", "Kommunenummer", hit.Kommunenummer ?? "<ukjent>", "Kommunekoden til eiendommen."));
                 rows.Add(new KartverketPopupRow("📌", "Gårdsnummer", hit.Gardsnummer.ToString(CultureInfo.InvariantCulture), "Hoveddelen av matrikkelnummeret."));
                 rows.Add(new KartverketPopupRow("🧱", "Bruksnummer", hit.Bruksnummer.ToString(CultureInfo.InvariantCulture), "Undernummeret i matrikkelnummeret."));
