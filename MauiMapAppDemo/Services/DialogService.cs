@@ -36,9 +36,9 @@ namespace MauiMapAppDemo.Services
             return result.Result;
         }
 
-        public async Task ShowKartverketInfoPopupAsync(double latitude, double longitude, KartverketPunktResponse? response)
+        public async Task ShowKartverketInfoPopupAsync(double latitude, double longitude, KartverketPunktResponse? response, KartverketOmraadeResponse? omraadeResponse)
         {
-            var popup = new KartverketInfoPopup(latitude, longitude, response);
+            var popup = new KartverketInfoPopup(latitude, longitude, response, omraadeResponse);
 
             await Shell.Current.ShowPopupAsync(
                 popup,

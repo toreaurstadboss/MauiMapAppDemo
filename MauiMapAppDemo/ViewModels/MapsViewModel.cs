@@ -342,7 +342,15 @@ namespace MauiMapAppDemo.ViewModels
         private async Task ShowMatrikkelInformationAsync(double latitude, double longitude)
         {
             var kartverketResponse = await _kartverketService.GetMatrikkelInformationFromLocationAsync(latitude, longitude);
-            await _dialogService.ShowKartverketInfoPopupAsync(latitude, longitude, kartverketResponse);
+
+            if (kartverketResponse?.Eiendom?.Any() != true)
+            {
+                return;
+            }
+
+            var omraadeResponse = await _kartverketService.GetGeoJsonFromLocationAsync(latitude, longitude);            
+
+            await _dialogService.ShowKartverketInfoPopupAsync(latitude, longitude, kartverketResponse, omraadeResponse);
         }
 
         private void InitCabinPins()

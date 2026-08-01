@@ -9,7 +9,7 @@ namespace MauiMapAppDemo.ViewModels
 
     public sealed class KartverketInfoPopupViewModel
     {
-        public KartverketInfoPopupViewModel(double latitude, double longitude, KartverketPunktResponse? response)
+        public KartverketInfoPopupViewModel(double latitude, double longitude, KartverketPunktResponse? response, KartverketOmraadeResponse? omraadeResponse)
         {
             var hit = response?.Eiendom?.FirstOrDefault();
             var totalHits = response?.Metadata?.TotaltAntallTreff ?? 0;
@@ -28,8 +28,8 @@ namespace MauiMapAppDemo.ViewModels
                 StatusText = $"✅ {totalHits} treff i Kartverket, vist med det nærmeste treffet først.";
             }
 
-            SummaryRows = BuildSummaryRows(latitude, longitude, hit, totalHits);
-            DetailRows = BuildDetailRows(response, hit);
+            SummaryRows = BuildSummaryRows(latitude, longitude, hit, totalHits, omraadeResponse);
+            DetailRows = BuildDetailRows(response, hit, omraadeResponse);
             Explanations = BuildExplanations();
         }
 
@@ -51,7 +51,8 @@ namespace MauiMapAppDemo.ViewModels
             double latitude,
             double longitude,
             Punkt? hit,
-            int totalHits)
+            int totalHits,
+            KartverketOmraadeResponse? omraadeResponse)
         {
             var rows = new List<KartverketPopupRow>
             {
@@ -89,18 +90,24 @@ namespace MauiMapAppDemo.ViewModels
                     "📏",
                     "Avstand fra punkt",
                     hit == null ? "<ukjent>" : $"{hit.MeterFraPunkt} m",
-                    "Hvor mange meter treffet ligger fra klikkpunktet.")
+                    "Hvor mange meter treffet ligger fra klikkpunktet."),
+                new(
+                    " 📐",
+                    " Beregnet areal (GeoJSON)",
+                    hit == null || omraadeResponse?.Features?.Any() != true ? "ukjent" : $"{omraadeResponse.TotalAreaOfAllAreas}  m² (kvm. sq.metres)",
+                    "Størrelse på eiendom utregnet fra polygon")
             };
 
             return rows;
         }
 
-        private static IReadOnlyList<KartverketPopupRow> BuildDetailRows(KartverketPunktResponse? response, Punkt? hit)
+        private static IReadOnlyList<KartverketPopupRow> BuildDetailRows(KartverketPunktResponse? response, Punkt? hit, KartverketOmraadeResponse? kartverketOmraadeResponse)
         {
             var rows = new List<KartverketPopupRow>();
 
             if (hit != null)
             {
+                rows.Add(new KartverketPopupRow("📐", "Beregnet areal", kartverketOmraadeResponse?.TotalAreaOfAllAreas.ToString() ?? "<ukjent>", "Beregnet areal av eiendommen"));
                 rows.Add(new KartverketPopupRow("🏛️", "Kommunenummer", hit.Kommunenummer ?? "<ukjent>", "Kommunekoden til eiendommen."));
                 rows.Add(new KartverketPopupRow("📌", "Gårdsnummer", hit.Gardsnummer.ToString(CultureInfo.InvariantCulture), "Hoveddelen av matrikkelnummeret."));
                 rows.Add(new KartverketPopupRow("🧱", "Bruksnummer", hit.Bruksnummer.ToString(CultureInfo.InvariantCulture), "Undernummeret i matrikkelnummeret."));
@@ -112,7 +119,6 @@ namespace MauiMapAppDemo.ViewModels
                 rows.Add(new KartverketPopupRow("🧪", "Teig med flere matrikkelenheter", ToYesNo(hit.Teigmedflerematrikkelenheter), "Om teigen deles av flere registrerte enheter."));
                 rows.Add(new KartverketPopupRow("🧷", "Uregistrert jordsameie", ToYesNo(hit.Uregistrertjordsameie), "Om registrerte nummer har andel i samme teig."));
                 rows.Add(new KartverketPopupRow("🕒", "Oppdateringsdato", hit.Oppdateringsdato?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "<ukjent>", "Når objektet sist ble oppdatert."));
-
             }
 
             if (response?.Metadata != null)
