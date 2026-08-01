@@ -1,11 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using MauiMapAppDemo.Repositories.PinLocations;
-using MauiMapAppDemo.ViewModels.Messages;
 using MauiMapAppDemo.Services;
+using MauiMapAppDemo.ViewModels.Messages;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Maui.Alerts;
 
 namespace MauiMapAppDemo.ViewModels
 {
@@ -70,7 +70,7 @@ namespace MauiMapAppDemo.ViewModels
                 ToggleHeightProfileCommand.Execute(null);
             });
 
-            WeakReferenceMessenger.Default.Register<ToggleMatrikkelInfoCommandMessage> (this, (_, _) =>
+            WeakReferenceMessenger.Default.Register<ToggleMatrikkelInfoCommandMessage>(this, (_, _) =>
             {
                 ToggleShowMatrikkelInformationCommand.Execute(null);
             });
@@ -181,7 +181,7 @@ namespace MauiMapAppDemo.ViewModels
 
                 return;
             }
-            
+
             //Third click restarts over 
             FirstLocationMeasureMode = location;
             SecondLocationMeasureMode = null;
@@ -301,8 +301,8 @@ namespace MauiMapAppDemo.ViewModels
             if (copiedToClipboard)
             {
                 Toast.Make($"✅ Copied coordinates to clipboard: {chosenAction}!", CommunityToolkit.Maui.Core.ToastDuration.Short, 18);
-            }   
-            
+            }
+
             if (chosenAction == showDetails)
             {
                 await _dialogService.ShowAlertAsync(label, pointClickedMessageInfo);

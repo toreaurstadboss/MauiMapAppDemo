@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
 
 namespace MauiMapAppDemo.Services
@@ -107,7 +106,7 @@ namespace MauiMapAppDemo.Services
                     sb.Append("/" + Seksjonsnummer);
                 }
 
-                return sb.ToString();                
+                return sb.ToString();
             }
         }
     }

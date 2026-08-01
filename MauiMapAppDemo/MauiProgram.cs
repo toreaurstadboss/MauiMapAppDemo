@@ -3,9 +3,7 @@ using MauiMapAppDemo.Behaviors;
 using MauiMapAppDemo.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui;
 using Microsoft.Maui.Maps.Handlers;
-using Microsoft.Maui.Storage;
 
 namespace MauiMapAppDemo
 {
@@ -57,7 +55,7 @@ namespace MauiMapAppDemo
             builder.ConfigureEssentials(essentials => essentials.UseMapServiceToken(azureMapsKey));
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             builder.Services.AddSingleton<OpenTopoService>();

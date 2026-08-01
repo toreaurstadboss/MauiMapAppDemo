@@ -15,12 +15,12 @@ namespace MauiMapAppDemo.Services
             }
 
             var placemarkDescription = GetPlacementDescription(placemark);
-            return placemarkDescription;            
+            return placemarkDescription;
         }
 
         private string? GetPlacementDescription(Placemark placemark)
         {
-            var sb = new StringBuilder(); 
+            var sb = new StringBuilder();
 
             AddIfAvailable(nameof(placemark.FeatureName), placemark.FeatureName);
             AddIfAvailable(nameof(placemark.Thoroughfare), placemark.Thoroughfare);

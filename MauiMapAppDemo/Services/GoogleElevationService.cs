@@ -66,6 +66,12 @@ namespace MauiMapAppDemo.Services
         private static string? GetAndroidManifestGoogleMapsKey()
         {
             var context = Android.App.Application.Context;
+            
+            if (string.IsNullOrWhiteSpace(context?.PackageName))
+            {
+                return null;
+            }
+
             var applicationInfo = context.PackageManager?.GetApplicationInfo(context.PackageName, PackageInfoFlags.MetaData);
 
             return applicationInfo?.MetaData?.GetString("com.google.android.geo.API_KEY");

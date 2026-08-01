@@ -1,7 +1,4 @@
-﻿
-using System.Diagnostics;
-
-namespace MauiMapAppDemo.Services
+﻿namespace MauiMapAppDemo.Services
 {
     public class ElevationResponse
     {
@@ -19,10 +16,10 @@ namespace MauiMapAppDemo.Services
             /// <remarks>For example, most data sets does not contain barymetric data (sea depths) , so clicking in a point in the ocean will give a non parseable value for the elevation</remarks>
             public double? Elevation { get; set; }
 
-           
-            public ElevationLocation Location { get; set; } 
 
-            public string DataSet { get; set; }
+            public required ElevationLocation Location { get; set; }
+
+            public required string DataSet { get; set; }
 
         }
 
@@ -33,5 +30,5 @@ namespace MauiMapAppDemo.Services
         }
 
     }
-    
+
 }

@@ -95,7 +95,7 @@ namespace MauiMapAppDemo.Behaviors
                 typeof(IEnumerable<MapPinModel>),
                 typeof(MapPinsBehavior),
                 propertyChanged: OnPinItemsChanged
-                );      
+                );
 
         public IEnumerable<MapPinModel>? PinItems
         {

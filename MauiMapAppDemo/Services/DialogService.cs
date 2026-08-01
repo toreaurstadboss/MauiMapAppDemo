@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
 using MauiMapAppDemo.Views;
 
 namespace MauiMapAppDemo.Services
@@ -17,7 +16,7 @@ namespace MauiMapAppDemo.Services
                 cancel);
         }
 
-        public async Task<string> ShowActionSheetAsync(string title,  string message, params string[] buttons)
+        public async Task<string> ShowActionSheetAsync(string title, string message, params string[] buttons)
         {
             return await Shell.Current.DisplayActionSheetAsync($"{title}\n\n{message}", "OK", null,
                 buttons);

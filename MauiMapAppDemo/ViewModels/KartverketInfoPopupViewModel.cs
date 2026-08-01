@@ -1,6 +1,5 @@
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using MauiMapAppDemo.Services;
+using System.Globalization;
 
 namespace MauiMapAppDemo.ViewModels
 {
@@ -29,7 +28,7 @@ namespace MauiMapAppDemo.ViewModels
                 StatusText = $"✅ {totalHits} treff i Kartverket, vist med det nærmeste treffet først.";
             }
 
-            SummaryRows = BuildSummaryRows(latitude, longitude, response, hit, totalHits);
+            SummaryRows = BuildSummaryRows(latitude, longitude, hit, totalHits);
             DetailRows = BuildDetailRows(response, hit);
             Explanations = BuildExplanations();
         }
@@ -51,7 +50,6 @@ namespace MauiMapAppDemo.ViewModels
         private static IReadOnlyList<KartverketPopupRow> BuildSummaryRows(
             double latitude,
             double longitude,
-            KartverketPunktResponse? response,
             Punkt? hit,
             int totalHits)
         {

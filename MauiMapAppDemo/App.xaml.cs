@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace MauiMapAppDemo
+﻿namespace MauiMapAppDemo
 {
     public partial class App : Application
     {
