@@ -101,14 +101,14 @@ namespace MauiMapAppDemo.ViewModels
 
             if (hit != null)
             {
-                rows.Add(new KartverketPopupRow("🧱", "Bruksnummer", hit.Bruksnummer.ToString(CultureInfo.InvariantCulture), "Undernummeret i matrikkelnummeret."));
                 rows.Add(new KartverketPopupRow("🏛️", "Kommunenummer", hit.Kommunenummer ?? "<ukjent>", "Kommunekoden til eiendommen."));
+                rows.Add(new KartverketPopupRow("📌", "Gårdsnummer", hit.Gardsnummer.ToString(CultureInfo.InvariantCulture), "Hoveddelen av matrikkelnummeret."));
+                rows.Add(new KartverketPopupRow("🧱", "Bruksnummer", hit.Bruksnummer.ToString(CultureInfo.InvariantCulture), "Undernummeret i matrikkelnummeret."));
                 rows.Add(new KartverketPopupRow("🧩", "Festenummer", hit.Festenummer.ToString(CultureInfo.InvariantCulture), "Nummer for festet grunn."));
-                rows.Add(new KartverketPopupRow("📌", "Gardsnummer", hit.Gardsnummer.ToString(CultureInfo.InvariantCulture), "Hoveddelen av matrikkelnummeret."));
+                rows.Add(new KartverketPopupRow("🔢", "Seksjonsnummer", hit.Seksjonsnummer.ToString(CultureInfo.InvariantCulture), "Seksjon i borettslag/sameie når det er relevant."));
                 rows.Add(new KartverketPopupRow("🆔", "Lokalid", hit.Lokalid.ToString(CultureInfo.InvariantCulture), "Intern identifikator i Kartverket."));
                 rows.Add(new KartverketPopupRow("🕒", "Oppdateringsdato", hit.Oppdateringsdato?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "<ukjent>", "Når objektet sist ble oppdatert."));
                 rows.Add(new KartverketPopupRow("🗺️", "Representasjonspunkt", hit.Representasjonspunkt == null ? "<ukjent>" : $"{hit.Representasjonspunkt.Nord.ToString("F6", CultureInfo.InvariantCulture)}, {hit.Representasjonspunkt.Ost.ToString("F6", CultureInfo.InvariantCulture)}", "Kartverkets representasjon av eiendommen."));
-                rows.Add(new KartverketPopupRow("🔢", "Seksjonsnummer", hit.Seksjonsnummer.ToString(CultureInfo.InvariantCulture), "Seksjon i borettslag/sameie når det er relevant."));
                 rows.Add(new KartverketPopupRow("🧪", "Teig med flere matrikkelenheter", ToYesNo(hit.Teigmedflerematrikkelenheter), "Om teigen deles av flere registrerte enheter."));
                 rows.Add(new KartverketPopupRow("🧷", "Uregistrert jordsameie", ToYesNo(hit.Uregistrertjordsameie), "Om registrerte nummer har andel i samme teig."));
                 rows.Add(new KartverketPopupRow("🏘️", "Fullstendig matrikkelnummer", hit.FullstendigMatrikkelNummer.ToString(CultureInfo.InvariantCulture), "Fullstendig matrikkelnummer. Unikt på nasjonalt nivå."));
