@@ -12,6 +12,7 @@ namespace MauiMapAppDemo.Behaviors
         private Microsoft.Maui.Controls.Maps.Map? _map;
 
         private Microsoft.Maui.Controls.Maps.Polyline? _measurementLine;
+        private Microsoft.Maui.Controls.Maps.Polygon? _matrikkelPolygon;
 
         private Microsoft.Maui.Controls.Maps.Pin? _startPin;
         private Microsoft.Maui.Controls.Maps.Pin? _endPin;
@@ -28,6 +29,20 @@ namespace MauiMapAppDemo.Behaviors
         {
             get => (bool)GetValue(IsMatrikkelModeProperty);
             set => SetValue(IsMatrikkelModeProperty, value);
+        }
+
+        public static readonly BindableProperty MatrikkelPolygonPathProperty =
+            BindableProperty.Create(
+                nameof(MatrikkelPolygonPath),
+                typeof(IEnumerable<Location>),
+                typeof(MapPinsBehavior),
+                defaultValue: Array.Empty<Location>(),
+                propertyChanged: OnMatrikkelPolygonPathChanged);
+
+        public IEnumerable<Location> MatrikkelPolygonPath
+        {
+            get => (IEnumerable<Location>)GetValue(MatrikkelPolygonPathProperty);
+            set => SetValue(MatrikkelPolygonPathProperty, value);
         }
 
 
@@ -138,6 +153,7 @@ namespace MauiMapAppDemo.Behaviors
             base.OnAttachedTo(bindable);
 
             RefreshPins();
+            RefreshMatrikkelPolygon();
 
             if (Center is not null)
             {
@@ -158,6 +174,8 @@ namespace MauiMapAppDemo.Behaviors
 
         protected override void OnDetachingFrom(Microsoft.Maui.Controls.Maps.Map bindable)
         {
+            ClearMeasurementGraphics();
+            ClearMatrikkelPolygon();
             _map = null;
 
             base.OnDetachingFrom(bindable);
@@ -193,10 +211,20 @@ namespace MauiMapAppDemo.Behaviors
         {
             var behavior = (MapPinsBehavior)bindable;
 
-            if (!(bool)newValue)
+            if (newValue is not bool isMeasuringMode || !isMeasuringMode)
             {
                 behavior.ClearMeasurementGraphics();
             }
+
+            behavior.RefreshMatrikkelPolygon();
+        }
+
+        private static void OnMatrikkelPolygonPathChanged(
+            BindableObject bindable,
+            object oldValue,
+            object newValue)
+        {
+            ((MapPinsBehavior)bindable).RefreshMatrikkelPolygon();
         }
 
 
@@ -290,6 +318,64 @@ namespace MauiMapAppDemo.Behaviors
             _startPin = null;
             _endPin = null;
             _measurementLine = null;
+        }
+
+        private void ClearMatrikkelPolygon()
+        {
+            if (_map == null)
+            {
+                return;
+            }
+
+            if (_matrikkelPolygon != null)
+            {
+                _map.MapElements.Remove(_matrikkelPolygon);
+            }
+
+            _matrikkelPolygon = null;
+        }
+
+        private void RefreshMatrikkelPolygon()
+        {
+            if (_map?.MapElements == null)
+            {
+                return;
+            }
+
+            ClearMatrikkelPolygon();
+
+            if (!IsMatrikkelMode || !MatrikkelPolygonPath.Any())
+            {
+                return;
+            }
+
+            var polygon = new Polygon
+            {
+                StrokeColor = Colors.Red,
+                StrokeWidth = 5,
+                FillColor = Color.FromArgb("#22FF0000")
+            };
+
+            foreach (var location in MatrikkelPolygonPath)
+            {
+                polygon.Geopath.Add(location);
+            }
+
+            if (polygon.Geopath.Count < 3)
+            {
+                return;
+            }
+
+            var firstLocation = polygon.Geopath.First();
+            var lastLocation = polygon.Geopath.Last();
+
+            if (firstLocation.Latitude != lastLocation.Latitude || firstLocation.Longitude != lastLocation.Longitude)
+            {
+                polygon.Geopath.Add(firstLocation);
+            }
+
+            _matrikkelPolygon = polygon;
+            _map.MapElements.Add(polygon);
         }
 
         private void RefreshPins()

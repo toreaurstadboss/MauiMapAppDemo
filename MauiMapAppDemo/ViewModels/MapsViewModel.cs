@@ -49,6 +49,12 @@ namespace MauiMapAppDemo.ViewModels
         [ObservableProperty]
         private bool _isHeightProfilesUpdated;
 
+        [ObservableProperty]
+        private IEnumerable<Location> _matrikkelPolygonPath = Array.Empty<Location>();
+
+        [ObservableProperty]
+        private string _matrikkelAreaText = string.Empty;
+
         public ObservableCollection<MapPinModel> CabinPins { get; } = [];
 
         public MapsViewModel(IElevationService elevationService, GeocodingService geocodingService, DialogService dialogService, KartverketService kartverketService)
@@ -117,6 +123,15 @@ namespace MauiMapAppDemo.ViewModels
             IsMeasuringMode = false;
             IsHeightProfileMode = false;
             IsMatrikkelMode = !IsMatrikkelMode;
+
+            if (IsMatrikkelMode)
+            {
+                MatrikkelAreaText = "Klikk i kartet for å hente eiendomsgrensen.";
+            }
+            else
+            {
+                ClearMatrikkelOverlay();
+            }
         }
 
 
@@ -244,6 +259,8 @@ namespace MauiMapAppDemo.ViewModels
 
         private async Task ShowLocationInformationAlert(double latitude, double longitude)
         {
+            await UpdateMatrikkelOverlayAsync(latitude, longitude);
+
             var elevationOfPoint = await _elevationService.GetElevationAsync(latitude, longitude);
 
             var placementInfo = await _geocodingService.GetGeocodingPlacemark(latitude, longitude);
@@ -351,6 +368,78 @@ namespace MauiMapAppDemo.ViewModels
             var omraadeResponse = await _kartverketService.GetGeoJsonFromLocationAsync(latitude, longitude);            
 
             await _dialogService.ShowKartverketInfoPopupAsync(latitude, longitude, kartverketResponse, omraadeResponse);
+        }
+
+        private async Task UpdateMatrikkelOverlayAsync(double latitude, double longitude)
+        {
+            if (!IsMatrikkelMode)
+            {
+                ClearMatrikkelOverlay();
+                return;
+            }
+
+            var omraadeResponse = await _kartverketService.GetGeoJsonFromLocationAsync(latitude, longitude);
+            var feature = omraadeResponse?.Features?.FirstOrDefault();
+            var coordinates = feature?.Geometry?.Coordinates;
+
+            if (coordinates?.Length > 0)
+            {
+                var outerRing = coordinates[0];
+
+                if (outerRing?.Length >= 3)
+                {
+                    MatrikkelPolygonPath = BuildMatrikkelPolygonPath(outerRing);
+
+                    if (omraadeResponse?.TotalAreaOfAllAreas is double totalArea && totalArea > 0)
+                    {
+                        MatrikkelAreaText = FormatMatrikkelAreaText(totalArea);
+                    }
+                    else
+                    {
+                        MatrikkelAreaText = "Areal: ukjent";
+                    }
+
+                    return;
+                }
+            }
+
+            ClearMatrikkelOverlay();
+            MatrikkelAreaText = "Ingen eiendom funnet for valgt punkt.";
+        }
+
+        private static IEnumerable<Location> BuildMatrikkelPolygonPath(double[][] outerRing)
+        {
+            var path = new List<Location>(outerRing.Length + 1);
+
+            for (int index = 0; index < outerRing.Length; index++)
+            {
+                path.Add(new Location(outerRing[index][1], outerRing[index][0]));
+            }
+
+            if (path.Count > 0)
+            {
+                var firstLocation = path[0];
+                var lastLocation = path[^1];
+
+                if (firstLocation.Latitude != lastLocation.Latitude || firstLocation.Longitude != lastLocation.Longitude)
+                {
+                    path.Add(firstLocation);
+                }
+            }
+
+            return path;
+        }
+
+        private static string FormatMatrikkelAreaText(double areaSquareMetres)
+        {
+            var maal = areaSquareMetres / 1000d;
+            return $"Areal: {areaSquareMetres:N0} m² ({maal:N2} mål)";
+        }
+
+        private void ClearMatrikkelOverlay()
+        {
+            MatrikkelPolygonPath = Array.Empty<Location>();
+            MatrikkelAreaText = string.Empty;
         }
 
         private void InitCabinPins()

@@ -77,6 +77,13 @@
                 <Label Text=" km" VerticalOptions="Center" />
 
             </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="2" IsVisible="{Binding IsMatrikkelMode}">
+
+                <Label FontAttributes="Bold" Text="Matrikkel area: " HorizontalOptions="Center" VerticalOptions="Center" />
+                <Label Text="{Binding MatrikkelAreaText}" TextColor="DarkRed" VerticalOptions="Center" />
+
+            </HorizontalStackLayout>
             
         </VerticalStackLayout>
 
@@ -107,8 +114,9 @@
                     Center="{Binding MapCenter}"
                     PinItems="{Binding CabinPins}" 
                     IsMeasuringMode="{Binding IsMeasuringMode}"
-                    IsMatrikkelMode="{Binding IsMatrikkelMode}"
+                    IsMatrikkelMode="{Binding IsMatrikkelMode}"                   
                     MeasureStart="{Binding FirstLocationMeasureMode}"
+                    MatrikkelPolygonPath="{Binding MatrikkelPolygonPath}"
                     MeasureEnd="{Binding SecondLocationMeasureMode}"
                     MapClickedCommand="{Binding MapClickedCommand}"
                     PinClickedCommand="{Binding PinClickedCommand}" />
