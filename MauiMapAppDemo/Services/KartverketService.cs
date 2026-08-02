@@ -9,6 +9,10 @@ namespace MauiMapAppDemo.Services
     {
 
         private const string _apiKartverketEiendomV1BaseUrl = "https://api.kartverket.no/eiendom/v1/";
+        private static readonly JsonSerializerOptions s_camelCaseJsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
         private readonly HttpClient _httpClient = new HttpClient
         {
@@ -26,10 +30,7 @@ namespace MauiMapAppDemo.Services
         {
             string url = $"punkt?ost={longitude.ToString(CultureInfo.InvariantCulture)}&nord={latitude.ToString(CultureInfo.InvariantCulture)}&koordsys={koordSys}&radius=10&utkoordsys={koordSys}&treffPerSide=1&side=1";
 
-            var kartverketResponseForLocation = await _httpClient.GetFromJsonAsync<KartverketPunktResponse>(url, options: new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var kartverketResponseForLocation = await _httpClient.GetFromJsonAsync<KartverketPunktResponse>(url, options: s_camelCaseJsonOptions);
             return kartverketResponseForLocation;
         }
 
@@ -45,10 +46,7 @@ namespace MauiMapAppDemo.Services
         {
             string url = $"punkt/omrader?ost={longitude.ToString(CultureInfo.InvariantCulture)}&nord={latitude.ToString(CultureInfo.InvariantCulture)}&koordsys={koordSys}&radius=10&utkoordsys={koordSys}&treffPerSide=1&side=1";
 
-            var kartverketResponseForLocation = await _httpClient.GetFromJsonAsync<KartverketOmraadeResponse>(url, options: new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var kartverketResponseForLocation = await _httpClient.GetFromJsonAsync<KartverketOmraadeResponse>(url, options: s_camelCaseJsonOptions);
             return kartverketResponseForLocation;
 
 

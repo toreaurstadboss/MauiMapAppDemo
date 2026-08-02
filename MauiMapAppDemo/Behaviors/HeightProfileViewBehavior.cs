@@ -14,7 +14,7 @@ namespace MauiMapAppDemo.Behaviors
 
         private void OnBindingContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(HeightProfiles) or nameof(MeasureStart) or nameof(MeasureEnd) or "IsHeightProfilesUpdated")
+            if (e.PropertyName is nameof(HeightProfiles) or nameof(MeasureStart) or nameof(MeasureEnd))
             {
                 InvalidateGraphicsView();
             }
@@ -149,6 +149,34 @@ namespace MauiMapAppDemo.Behaviors
                 return;
             }
 
+            var minX = points[0].X;
+            var maxX = points[0].X;
+            var minY = points[0].Y;
+            var maxY = points[0].Y;
+
+            foreach (var point in points)
+            {
+                if (point.X < minX)
+                {
+                    minX = point.X;
+                }
+
+                if (point.X > maxX)
+                {
+                    maxX = point.X;
+                }
+
+                if (point.Y < minY)
+                {
+                    minY = point.Y;
+                }
+
+                if (point.Y > maxY)
+                {
+                    maxY = point.Y;
+                }
+            }
+
             var leftMargin = 72f;
             var rightMargin = 12f;
             var topMargin = 12f;
@@ -159,12 +187,7 @@ namespace MauiMapAppDemo.Behaviors
                 Math.Max(0, dirtyRect.Width - leftMargin - rightMargin),
                 Math.Max(0, dirtyRect.Height - topMargin - bottomMargin));
 
-            DrawAxes(canvas, plotRect, points);
-
-            var minX = points.Min(point => point.X);
-            var maxX = points.Max(point => point.X);
-            var minY = points.Min(point => point.Y);
-            var maxY = points.Max(point => point.Y);
+            DrawAxes(canvas, plotRect, minX, maxX, minY, maxY);
 
             if (Math.Abs(maxX - minX) < 0.0001f)
             {
@@ -208,7 +231,7 @@ namespace MauiMapAppDemo.Behaviors
             canvas.RestoreState();
         }
 
-        private static void DrawAxes(ICanvas canvas, RectF plotRect, IReadOnlyList<PointF> points)
+        private static void DrawAxes(ICanvas canvas, RectF plotRect, float minX, float maxX, float minY, float maxY)
         {
             canvas.StrokeColor = Colors.LightGray;
             canvas.StrokeSize = 1;
@@ -216,14 +239,12 @@ namespace MauiMapAppDemo.Behaviors
             canvas.DrawLine(plotRect.Left, plotRect.Bottom, plotRect.Right, plotRect.Bottom);
             canvas.DrawLine(plotRect.Left, plotRect.Top, plotRect.Left, plotRect.Bottom);
 
-            DrawXTicks(canvas, plotRect, points);
-            DrawYTicks(canvas, plotRect, points);
+            DrawXTicks(canvas, plotRect, minX, maxX);
+            DrawYTicks(canvas, plotRect, minY, maxY);
         }
 
-        private static void DrawXTicks(ICanvas canvas, RectF plotRect, IReadOnlyList<PointF> points)
+        private static void DrawXTicks(ICanvas canvas, RectF plotRect, float minX, float maxX)
         {
-            var minX = 0f;
-            var maxX = points.Max(point => point.X);
             var tickCount = 5;
 
             canvas.FontSize = 10;
@@ -244,10 +265,8 @@ namespace MauiMapAppDemo.Behaviors
             }
         }
 
-        private static void DrawYTicks(ICanvas canvas, RectF plotRect, IReadOnlyList<PointF> points)
+        private static void DrawYTicks(ICanvas canvas, RectF plotRect, float minY, float maxY)
         {
-            var minY = points.Min(point => point.Y);
-            var maxY = points.Max(point => point.Y);
             var tickCount = 5;
 
             canvas.FontSize = 10;

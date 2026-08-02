@@ -10,6 +10,7 @@ namespace MauiMapAppDemo.Behaviors
     {
 
         private Microsoft.Maui.Controls.Maps.Map? _map;
+        private EventHandler<MapClickedEventArgs>? _mapClickedHandler;
 
         private Microsoft.Maui.Controls.Maps.Polyline? _measurementLine;
         private Microsoft.Maui.Controls.Maps.Polygon? _matrikkelPolygon;
@@ -163,17 +164,25 @@ namespace MauiMapAppDemo.Behaviors
 
         private void WireUpMapClickedCommand(Microsoft.Maui.Controls.Maps.Map map)
         {
-            map.MapClicked += (object? sender, MapClickedEventArgs e) =>
+            _mapClickedHandler = (object? sender, MapClickedEventArgs e) =>
             {
                 if (MapClickedCommand?.CanExecute(e.Location) == true)
                 {
                     MapClickedCommand.Execute(e.Location);
                 }
             };
+
+            map.MapClicked += _mapClickedHandler;
         }
 
         protected override void OnDetachingFrom(Microsoft.Maui.Controls.Maps.Map bindable)
         {
+            if (_mapClickedHandler != null)
+            {
+                bindable.MapClicked -= _mapClickedHandler;
+                _mapClickedHandler = null;
+            }
+
             ClearMeasurementGraphics();
             ClearMatrikkelPolygon();
             _map = null;
