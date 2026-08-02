@@ -83,7 +83,7 @@ namespace MauiMapAppDemo
                 return 0;
             }
 
-            var field = typeof(Resource.Drawable).GetField(resourceName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.IgnoreCase);
+            var field = typeof(CommunityToolkit.Maui.Resource.Drawable).GetField(resourceName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.IgnoreCase);
             if (field?.GetValue(null) is int resourceId)
             {
                 return resourceId;
