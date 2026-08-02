@@ -50,7 +50,7 @@ namespace MauiMapAppDemo.ViewModels
         private bool _isHeightProfilesUpdated;
 
         [ObservableProperty]
-        private IEnumerable<Location> _matrikkelPolygonPath = Array.Empty<Location>();
+        private Location[] _matrikkelPolygonPath = Array.Empty<Location>();
 
         [ObservableProperty]
         private string _matrikkelAreaText = string.Empty;
@@ -407,7 +407,7 @@ namespace MauiMapAppDemo.ViewModels
             MatrikkelAreaText = "Ingen eiendom funnet for valgt punkt.";
         }
 
-        private static IEnumerable<Location> BuildMatrikkelPolygonPath(double[][] outerRing)
+        private static Location[] BuildMatrikkelPolygonPath(double[][] outerRing)
         {
             var path = new List<Location>(outerRing.Length + 1);
 
@@ -427,7 +427,7 @@ namespace MauiMapAppDemo.ViewModels
                 }
             }
 
-            return path;
+            return path.ToArray();
         }
 
         private static string FormatMatrikkelAreaText(double areaSquareMetres)

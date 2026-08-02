@@ -34,7 +34,7 @@ namespace MauiMapAppDemo.Behaviors
         public static readonly BindableProperty MatrikkelPolygonPathProperty =
             BindableProperty.Create(
                 nameof(MatrikkelPolygonPath),
-                typeof(IEnumerable<Location>),
+                typeof(Location[]),
                 typeof(MapPinsBehavior),
                 defaultValue: Array.Empty<Location>(),
                 propertyChanged: OnMatrikkelPolygonPathChanged);
